@@ -70,19 +70,47 @@ function goTo(path, anchor){
   setTimeout(function(){
     var el = document.getElementById(anchor);
     if(!el) return;
+    var sec = el.closest ? el.closest(".note-sec") : null;       /* the notes show one section at a time: open the right one */
+    if(sec && NOTE_OPEN[t]) NOTE_OPEN[t](sec.id, false);
     el.scrollIntoView({behavior:"smooth", block:"start"});
     el.classList.add("flashhit"); setTimeout(function(){ el.classList.remove("flashhit"); }, 1800);
   }, 60);
 }
 
 /* ================================================================ chapter notes */
+/* One section on screen at a time. Pick the lesson (4-1, 4-2 …), then one of its two to four
+   sections; Previous and Next walk through the chapter in order.                              */
+var NOTE_OPEN = {};
+function lessonOf(s){ return strip(s.h).split(" · ")[0]; }
+function noteTitle(s){ return strip(s.h).replace(/“|”/g,"").replace(/^[\d-]+ · /, ""); }
 function renderNotes(tp){
-  var c = CH[tp];
-  $("#"+tp+"Notes").innerHTML = '<div class="secnav">'+c.notes.map(function(s){ return '<a href="#'+s.id+'" data-a="'+s.id+'">'+strip(s.h).replace(/“|”/g,"").replace(/^Figure [\d.]+ · /, "")+'</a>'; }).join("")+'</div>'+
-    c.notes.map(function(s){ return '<div class="note-sec" id="'+s.id+'"><h2>'+s.h+'</h2>'+divider()+s.body+'</div>'; }).join("");
-  $$("#"+tp+"Notes .secnav a").forEach(function(a){
-    a.addEventListener("click", function(e){ e.preventDefault(); var el = document.getElementById(a.getAttribute("data-a")); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); });
+  var c = CH[tp], lessons = [];
+  c.notes.forEach(function(s){ if(lessons.indexOf(lessonOf(s)) < 0) lessons.push(lessonOf(s)); });
+  $("#"+tp+"Notes").innerHTML =
+    '<div class="lessonbar"><span class="label">Lesson</span><div class="seg lessons">'+lessons.map(function(l){ return '<button type="button" data-lesson="'+l+'" aria-pressed="false">'+l+'</button>'; }).join("")+'</div></div>'+
+    '<div class="secnav">'+c.notes.map(function(s){ return '<a href="#'+s.id+'" data-a="'+s.id+'" data-lesson="'+lessonOf(s)+'">'+noteTitle(s)+'</a>'; }).join("")+'</div>'+
+    c.notes.map(function(s, i){
+      return '<div class="note-sec" id="'+s.id+'" hidden><h2>'+s.h+'</h2>'+divider()+s.body+
+        '<div class="secstep"><button class="btn" type="button" data-step="'+(i-1)+'"'+(i === 0 ? ' disabled' : '')+'>&lsaquo; Previous</button>'+
+        '<span class="count">'+(i+1)+' of '+c.notes.length+'</span>'+
+        '<button class="btn primary" type="button" data-step="'+(i+1)+'"'+(i === c.notes.length-1 ? ' disabled' : '')+'>Next &rsaquo;</button></div></div>';
+    }).join("");
+  var root = $("#"+tp+"Notes");
+  function open(id, scroll){
+    var sec = c.notes.filter(function(s){ return s.id === id; })[0] || c.notes[0], les = lessonOf(sec);
+    $$(".note-sec", root).forEach(function(n){ n.hidden = (n.id !== sec.id); });
+    $$(".lessons button", root).forEach(function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-lesson") === les)); });
+    $$(".secnav a", root).forEach(function(a2){ a2.hidden = (a2.getAttribute("data-lesson") !== les); a2.classList.toggle("on", a2.getAttribute("data-a") === sec.id); });
+    store.set("note."+tp, sec.id);
+    if(scroll){ var top = $(".lessonbar", root); if(top && top.scrollIntoView) top.scrollIntoView({behavior:"smooth", block:"start"}); }
+  }
+  NOTE_OPEN[tp] = open;
+  $$(".lessons button", root).forEach(function(b){
+    b.addEventListener("click", function(){ var l = b.getAttribute("data-lesson"); open(c.notes.filter(function(s){ return lessonOf(s) === l; })[0].id, false); });
   });
+  $$(".secnav a", root).forEach(function(a2){ a2.addEventListener("click", function(e){ e.preventDefault(); open(a2.getAttribute("data-a"), false); }); });
+  $$(".secstep button", root).forEach(function(b){ b.addEventListener("click", function(){ var s = c.notes[parseInt(b.getAttribute("data-step"), 10)]; if(s) open(s.id, true); }); });
+  open(store.get("note."+tp), false);
 }
 
 /* ================================================================ practice exam */

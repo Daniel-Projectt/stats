@@ -216,6 +216,7 @@ ok(html.includes('id="flourish"') && html.includes('id="emblem"') && html.includ
 ok(html.indexOf('--gold:#6b4c7c') > html.indexOf('--gold:#9a7a44'), 'the plum override comes after the gold base, so it wins');
 ok(/id="kitCard"/.test(html) && /id="kitTools"/.test(html) && /id="kitWhich"/.test(html), 'the exam kit panels exist');
 ok(html.includes('rel="manifest"') && html.includes('sw.js') && fs.existsSync(path.join(ROOT, 'sw.js')) && fs.existsSync(path.join(ROOT, 'manifest.webmanifest')), 'PWA pieces: manifest and service worker');
+ok(/\.note-sec\[hidden\]\{display:none\}/.test(html) && /\.secnav a\[hidden\]\{display:none\}/.test(html) && /\.note-sec\[hidden\]\{display:block!important\}/.test(html), 'hidden sections are hidden on screen and all printed on paper');
 ok(/stats-v\d+/.test(fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8')), 'the service worker has its own cache name');
 ok(/Statistics for Business/.test(fs.readFileSync(path.join(ROOT, 'manifest.webmanifest'), 'utf8')), 'the manifest is this page’s');
 ok(html.includes('og:image') && html.includes('/stats/preview.png'), 'link preview metadata');

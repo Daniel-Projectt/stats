@@ -194,6 +194,28 @@ topic('c6'); mode('c6', 'cards');
 ok(w.localStorage.getItem('stats.topic') === 'c6' && w.localStorage.getItem('stats.mode.c6') === 'cards', 'topic and mode saved');
 ok($$('.topic-btn').length === 6, 'six tabs');
 
+head('notes: one section at a time');
+w.localStorage.removeItem('stats.note.c4');
+topic('c4'); mode('c4', 'notes');
+const shown = () => $$('#c4Notes .note-sec').filter(n => !n.hidden);
+const pills = () => $$('#c4Notes .secnav a').filter(a => !a.hidden);
+click($('#c4Notes .lessons button[data-lesson="4-1"]'));
+ok($$('#c4Notes .lessons button').length === 4 && $$('#c4Notes .lessons button').map(b => b.textContent).join() === '4-1,4-2,4-3,4-4', 'four lessons to choose from');
+ok(shown().length === 1 && shown()[0].id === 'c4-basics', 'only one section is on screen', shown().map(n => n.id).join());
+ok(pills().length === 3 && pills().every(a => !/^4-1/.test(a.textContent)), 'only this lesson’s three sections are offered, without the lesson number', pills().map(a => a.textContent).join(' | '));
+click(shown()[0].querySelector('.secstep .btn.primary'));
+ok(shown().length === 1 && shown()[0].id === 'c4-approach' && $('#c4Notes .secnav a.on').getAttribute('data-a') === 'c4-approach', 'Next moves to the following section');
+ok(/2 of 11/.test(shown()[0].querySelector('.secstep .count').textContent), 'and says where you are');
+click($('#c4Notes .lessons button[data-lesson="4-3"]'));
+ok(shown()[0].id === 'c4-comp' && pills().length === 4 && $('#c4Notes .lessons button[aria-pressed="true"]').textContent === '4-3', 'picking a lesson opens its first section');
+click(pills()[2]);
+ok(shown()[0].id === 'c4-bayes' && w.localStorage.getItem('stats.note.c4') === 'c4-bayes', 'picking a section opens it and is remembered');
+ok($('#c4-basics .secstep button').disabled && $$('#c4-perm .secstep button')[1].disabled, 'no Previous on the first section, no Next on the last');
+topic('guide');
+click($('#guideRoot .gitem[data-gi="g44-2"] button[data-go]'));
+ok(visible($('#topic-c4')), 'the guide still jumps into the notes');
+tps.forEach(t => ok($$('#' + t + 'Notes .note-sec').filter(n => !n.hidden).length === 1, t + ': exactly one section showing'));
+
 head('errors');
 ok(errors.length === 0, 'no runtime errors anywhere', errors.join(' || '));
 console.log('\n' + (fails === 0 ? 'ALL ' + checks + ' DOM CHECKS PASSED' : fails + ' FAILURES out of ' + checks + ' DOM checks'));
