@@ -176,3 +176,38 @@ var KIT = {
   ["normal, “what value”, percentile, top 5%", "Normal → cutoff", "Normal Explorer or =NORM.INV"],
   ["“a sample of n… the mean is”", "Sample mean", "same, but σ ÷ √n"]]
 };
+
+/* One worked example per objective, with the same numbers the chapter files use (test.js recomputes them). */
+var EX = {
+ "g41-1":["Roll one die. <b>Sample space:</b> {1, 2, 3, 4, 5, 6}. <b>One outcome:</b> “a 4”. <b>An event:</b> “an even number” = {2, 4, 6}.", "P(rolling a 7) = <b>0</b>, impossible. P(rolling below 7) = <b>1</b>, certain."],
+ "g41-2":["<b>Equally likely:</b> P(heart from a deck) = 13 ÷ 52 = <b>0.25</b>.", "<b>Past data:</b> 30 of 600 orders were returned → 30 ÷ 600 = <b>0.05</b>.", "<b>Judgment:</b> “a 70% chance our new store breaks even.”"],
+ "g41-3":["Flip a coin 10 times and you might see 70% heads. Flip it 10,000 times and you will be very near 50%.", "After five heads in a row, the next flip is still <b>0.5</b>. Tails is not “due”."],
+ "g42-1":["One card: P(king or heart). Kings 4, hearts 13, and the king of hearts is in both.", "(4 + 13 − 1) ÷ 52 = 16 ÷ 52 = <b>0.308</b>."],
+ "g42-2":["Two aces <b>with</b> replacement (independent): 4/52 × 4/52 = <b>0.0059</b>.", "Two aces <b>without</b> replacement (dependent): 4/52 × 3/51 = <b>0.0045</b>."],
+ "g43-1":["Each of 5 parts has a 10% chance of being defective. P(none) = 0.9⁵ = 0.5905, so P(at least one) = 1 − 0.5905 = <b>0.4095</b>.", "Exactly one is a smaller event: 5 × 0.1 × 0.9⁴ = <b>0.3281</b>."],
+ "g43-2":["200 orders: 100 online (30 returned) and 100 in store (10 returned).", "<b>Joint:</b> P(online and returned) = 30 ÷ 200 = <b>0.15</b>.", "<b>Conditional:</b> P(returned given online) = 30 ÷ 100 = <b>0.30</b>. The other way round, P(online given returned) = 30 ÷ 40 = <b>0.75</b>."],
+ "g43-3":["2% of transactions are fraud. The system flags 90% of fraud and 5% of honest ones. A transaction is flagged.", "P(fraud given flag) = (0.90 × 0.02) ÷ (0.90 × 0.02 + 0.05 × 0.98) = 0.018 ÷ 0.067 = <b>0.269</b>.", "P(flag given fraud) = 0.90 is a different question."],
+ "g43-4":["Same system, 10,000 transactions: 200 fraud and 9,800 honest. Flagged: 90% of 200 = 180, and 5% of 9,800 = 490.", "180 ÷ (180 + 490) = 180 ÷ 670 = <b>0.269</b>. In Excel: <code>=0.9*0.02/(0.9*0.02+0.05*0.98)</code>.", "Fraud is rare, so most flags are false alarms: look again before acting."],
+ "g44-1":["4 shirts and 3 pants → 4 × 3 = <b>12</b> outfits.", "5 people in a line → 5! = 5 × 4 × 3 × 2 × 1 = <b>120</b>. In Excel <code>=FACT(5)</code>."],
+ "g44-2":["From 10 people. A president, a VP and a treasurer (order matters): 10 × 9 × 8 = <b>720</b>, <code>=PERMUT(10,3)</code>.", "A committee of 3 (order does not matter): 720 ÷ 3! = <b>120</b>, <code>=COMBIN(10,3)</code>."],
+ "g51-1":["“The number of defects in a box” is <b>discrete</b>: you count it. “The time for a bulb to burn out” is <b>continuous</b>: you measure it.", "The variable is the rule, x = the number of defects. One value is x = 3."],
+ "g51-2":["x = 0, 1, 2, 3 with P(x) = 0.1, 0.3, 0.4, 0.2.", "The values are numbers ✓, each probability is between 0 and 1 ✓, and 0.1 + 0.3 + 0.4 + 0.2 = <b>1</b> ✓. Valid."],
+ "g51-3":["x = 0, 1, 2, 3 with P(x) = 0.1, 0.3, 0.4, 0.2.", "Mean = 0(0.1) + 1(0.3) + 2(0.4) + 3(0.2) = <b>1.7</b>.", "Variance = 3.7 − 1.7² = <b>0.81</b> (squared units). Standard deviation = √0.81 = <b>0.9</b> (original units)."],
+ "g51-4":["A $10 raffle ticket has a 1% chance to win $500. Expected value = 490(0.01) + (−10)(0.99) = <b>−$5</b> per ticket, on average. No single ticket loses $5.", "A sure $100 and a 50/50 chance at $200 or $0 both have an expected value of $100, but standard deviations of <b>0</b> and <b>$100</b>."],
+ "g52-1":["10 customers, each with a 30% chance of buying. The trial is one customer; a success is a purchase.", "<b>n = 10</b>, <b>p = 0.3</b>, x = the number who buy. Fixed n ✓, independent ✓, two outcomes ✓, same p ✓."],
+ "g52-2":["n = 10, p = 0.3.", "Exactly 3: <code>=BINOM.DIST(3,10,0.3,FALSE)</code> = <b>0.2668</b>. At most 3: <code>=BINOM.DIST(3,10,0.3,TRUE)</code> = <b>0.6496</b>.", "Fewer than 3: <code>=BINOM.DIST(2,10,0.3,TRUE)</code> = <b>0.3828</b>. At least 4: <code>=1-BINOM.DIST(3,10,0.3,TRUE)</code> = <b>0.3504</b>."],
+ "g52-3":["26 births, p = 0.5.", "Mean = 26 × 0.5 = <b>13</b>. Standard deviation = √(26 × 0.5 × 0.5) = √6.5 = <b>2.5</b>."],
+ "g53-1":["<b>Fits:</b> customers arriving at a steady 4 per hour. <b>Does not fit:</b> arrivals that surge at lunch, or people arriving in groups.", "“How many calls in an hour?” is a count: Poisson. “How long until the next call?” is a waiting time: not Poisson."],
+ "g53-2":["A store gets 4 customers per hour. In half an hour the mean is 4 × 0.5 = <b>2</b>.", "Exactly 2 in an hour: <code>=POISSON.DIST(2,4,FALSE)</code> = <b>0.1465</b>. None in half an hour: <code>=POISSON.DIST(0,2,FALSE)</code> = <b>0.1353</b>.", "At least 1 in an hour: <code>=1-POISSON.DIST(0,4,TRUE)</code> = <b>0.9817</b>."],
+ "g53-3":["Mean 4 per hour → variance <b>4</b>, standard deviation √4 = <b>2</b>.", "“10 customers, how many buy” has a clear n: binomial, and x stops at 10. “Calls in an hour” has no number of trials: Poisson, with no upper limit."],
+ "g61-1":["z = 1.5 means 1.5 standard deviations above the mean. The area left of −1 equals the area right of +1.", "The chance of one exact value is <b>0</b>; only a range has a probability, the area above it."],
+ "g61-2":["Left of z = 1.00: <b>0.8413</b>. Right of it: 1 − 0.8413 = <b>0.1587</b>. Between −1 and 1: 0.8413 − 0.1587 = <b>0.6827</b>.", "Backwards: the 95th percentile is <code>=NORM.S.INV(0.95)</code> = <b>1.645</b>."],
+ "g62-1":["Test scores are normal with mean 100 and standard deviation 15.", "Below 115: z = (115 − 100) ÷ 15 = 1.00 → <b>0.8413</b>. About 84% score below 115. <code>=NORM.DIST(115,100,15,TRUE)</code>", "Above 130: z = 2.00 → 1 − 0.9772 = <b>0.0228</b>."],
+ "g62-2":["Mean 100, standard deviation 15. What score marks the top 10%?", "Top 10% means 0.90 to the left. z = 1.282, so x = 100 + 1.282 × 15 = <b>119.2</b>. In one step: <code>=NORM.INV(0.90,100,15)</code>."],
+ "g63-1":["All students’ scores: the <b>population</b>, with mean μ. The 36 scores you drew: one <b>sample</b>, with mean x̄. The x̄ from every possible sample of 36: the <b>sampling distribution</b>.", "μ is a parameter; x̄ is a statistic."],
+ "g63-2":["Think of darts. <b>Bias</b>: the whole cluster sits away from the bullseye. <b>Variability</b>: how spread out the cluster is.", "The sample mean is unbiased: right on average, not in every sample. A larger sample shrinks variability; it does not fix bias."],
+ "g64-1":["Take a right-skewed population. With n = 2 the pile of sample means is still lopsided; with n = 30 it is bell-shaped.", "The population itself has not changed: only the means become normal."],
+ "g64-2":["σ = 15. n = 25 → 15 ÷ 5 = <b>3</b>. n = 36 → 15 ÷ 6 = <b>2.5</b>. n = 100 → 15 ÷ 10 = <b>1.5</b>.", "To cut the standard error in half you need four times the sample size."],
+ "g64-3":["Scores are normal with μ = 100 and σ = 15.", "One person above 105: z = (105 − 100) ÷ 15 = 0.33 → <b>0.3694</b>.", "The mean of 36 people above 105: standard error 15 ÷ √36 = 2.5, z = 2.00 → <b>0.0228</b>. <code>=1-NORM.DIST(105,100,15/SQRT(36),TRUE)</code>"],
+ "g65-1":["A bell-shaped histogram and quantile-plot points close to a straight line <b>support</b> a normal model.", "An S-shaped curve, or points far off the line, <b>raise concerns</b>. Either way the graphs are not proof."]
+};

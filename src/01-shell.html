@@ -9,22 +9,16 @@
   </header>
 
   <nav class="topics" role="tablist" aria-label="Sections">
-    <button class="topic-btn" role="tab" data-topic="guide" aria-selected="true">Guide</button>
+    <button class="topic-btn" role="tab" data-topic="guide" aria-selected="true">Objectives</button>
+    <button class="topic-btn" role="tab" data-topic="exam" aria-selected="false">Practice</button>
     <button class="topic-btn" role="tab" data-topic="kit" aria-selected="false">Exam Kit</button>
-    <button class="topic-btn" role="tab" data-topic="c4" aria-selected="false">4 &middot; Probability</button>
-    <button class="topic-btn" role="tab" data-topic="c5" aria-selected="false">5 &middot; Discrete</button>
-    <button class="topic-btn" role="tab" data-topic="c6" aria-selected="false">6 &middot; Normal</button>
-    <button class="topic-btn" role="tab" data-topic="exam" aria-selected="false">Practice Exam</button>
   </nav>
 
   <main>
 
     <!-- ================= GUIDE ================= -->
     <section class="topic" id="topic-guide">
-      <p class="intro">The three &ldquo;Chapter Objectives&rdquo; sheets, objective by objective, in their own words. Check one off once you can do it without looking; <b>Study it</b> jumps to the notes. Highlighted lines are what the exam is most likely to ask.</p>
-      <div class="modes"><div class="seg" data-modes="guide">
-        <button type="button" data-mode="overview" aria-pressed="true">The objectives</button>
-      </div></div>
+      <p class="intro">The 31 objectives from the three sheets, in their own words. Tap one to see the answer in short and one worked example.</p>
       <div class="panel" data-panel="guide/overview"><div id="guideRoot"></div></div>
     </section>
 
@@ -41,69 +35,9 @@
       <div class="panel" data-panel="kit/which" hidden><div id="kitWhich"></div></div>
     </section>
 
-    <!-- ================= CHAPTER 4 ================= -->
-    <section class="topic" id="topic-c4" hidden>
-      <p class="intro">Chapter 4: what a probability is, the addition and multiplication rules, complements and &ldquo;at least one&rdquo;, conditional probability and Bayes&rsquo; theorem, and counting with permutations and combinations.</p>
-      <div class="modes"><div class="seg" data-modes="c4">
-        <button type="button" data-mode="notes" aria-pressed="true">Notes</button>
-        <button type="button" data-mode="cards" aria-pressed="false">Flashcards</button>
-        <button type="button" data-mode="match" aria-pressed="false">Match</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
-      </div></div>
-      <div class="panel" data-panel="c4/notes"><div id="c4Notes"></div></div>
-      <div class="panel" data-panel="c4/cards" hidden>
-        <p class="hint">Front: the term or the problem. Back: the answer and its objective. Space flips, arrows move.</p>
-        <div class="toolbar"><span class="label">Deck</span><div class="seg" data-decks="c4"></div><button class="btn" type="button" data-shuffle="c4">Shuffle deck</button></div>
-        <div id="c4Cards"></div>
-      </div>
-      <div class="panel" data-panel="c4/match" hidden><p class="hint">Tap a term or a problem, then what goes with it.</p><div id="c4Match"></div></div>
-      <div class="panel" data-panel="c4/quiz" hidden><p class="hint">Multiple choice, true/false and application questions. Keys <kbd>1</kbd>&ndash;<kbd>4</kbd> answer, <kbd>Enter</kbd> moves on.</p><div id="c4Quiz"></div></div>
-    </section>
-
-    <!-- ================= CHAPTER 5 ================= -->
-    <section class="topic" id="topic-c5" hidden>
-      <p class="intro">Chapter 5: discrete and continuous random variables, the mean and standard deviation of a distribution, expected value, the binomial distribution and the Poisson distribution, with the Excel formula for each.</p>
-      <div class="modes"><div class="seg" data-modes="c5">
-        <button type="button" data-mode="notes" aria-pressed="true">Notes</button>
-        <button type="button" data-mode="cards" aria-pressed="false">Flashcards</button>
-        <button type="button" data-mode="match" aria-pressed="false">Match</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
-      </div></div>
-      <div class="panel" data-panel="c5/notes"><div id="c5Notes"></div></div>
-      <div class="panel" data-panel="c5/cards" hidden>
-        <p class="hint">Front: the term or the problem. Back: the answer and its objective. Space flips, arrows move.</p>
-        <div class="toolbar"><span class="label">Deck</span><div class="seg" data-decks="c5"></div><button class="btn" type="button" data-shuffle="c5">Shuffle deck</button></div>
-        <div id="c5Cards"></div>
-      </div>
-      <div class="panel" data-panel="c5/match" hidden><p class="hint">Tap a term or a problem, then what goes with it.</p><div id="c5Match"></div></div>
-      <div class="panel" data-panel="c5/quiz" hidden><p class="hint">Multiple choice, true/false and application questions. Keys <kbd>1</kbd>&ndash;<kbd>4</kbd> answer, <kbd>Enter</kbd> moves on.</p><div id="c5Quiz"></div></div>
-    </section>
-
-    <!-- ================= CHAPTER 6 ================= -->
-    <section class="topic" id="topic-c6" hidden>
-      <p class="intro">Chapter 6: the standard normal curve, areas and z-scores, probabilities and cutoffs for any normal distribution, sampling distributions, the central limit theorem and the standard error, and checking for normality.</p>
-      <div class="modes"><div class="seg" data-modes="c6">
-        <button type="button" data-mode="notes" aria-pressed="true">Notes</button>
-        <button type="button" data-mode="cards" aria-pressed="false">Flashcards</button>
-        <button type="button" data-mode="match" aria-pressed="false">Match</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
-      </div></div>
-      <div class="panel" data-panel="c6/notes"><div id="c6Notes"></div></div>
-      <div class="panel" data-panel="c6/cards" hidden>
-        <p class="hint">Front: the term or the problem. Back: the answer and its objective. Space flips, arrows move.</p>
-        <div class="toolbar"><span class="label">Deck</span><div class="seg" data-decks="c6"></div><button class="btn" type="button" data-shuffle="c6">Shuffle deck</button></div>
-        <div id="c6Cards"></div>
-      </div>
-      <div class="panel" data-panel="c6/match" hidden><p class="hint">Tap a term or a problem, then what goes with it.</p><div id="c6Match"></div></div>
-      <div class="panel" data-panel="c6/quiz" hidden><p class="hint">Multiple choice, true/false and application questions. Keys <kbd>1</kbd>&ndash;<kbd>4</kbd> answer, <kbd>Enter</kbd> moves on.</p><div id="c6Quiz"></div></div>
-    </section>
-
     <!-- ================= PRACTICE EXAM ================= -->
     <section class="topic" id="topic-exam" hidden>
       <p class="intro">Questions from all three chapters, built on the objectives: computations, which-formula questions, and the &ldquo;explain why&rdquo; ideas. Reshuffled each run, with the reason behind every answer.</p>
-      <div class="modes"><div class="seg" data-modes="exam">
-        <button type="button" data-mode="mock" aria-pressed="true">Practice exam</button>
-      </div></div>
       <div class="panel" data-panel="exam/mock"><div id="mockExam"></div></div>
     </section>
 
@@ -111,7 +45,7 @@
 
   <footer>
     <p>Built from the Statistics for Business &ldquo;Chapter 4, 5 and 6 Objectives&rdquo; sheets. Section numbers follow Triola, <i>Elementary Statistics</i>. The exam tools are the Normal Distribution Explorer and the Sampling Distribution Explorer at tools.benhartlage.com.</p>
-    <span class="keys">Flashcards <kbd>&larr;</kbd> <kbd>&rarr;</kbd> <kbd>Space</kbd> &nbsp;&middot;&nbsp; Quizzes <kbd>1</kbd>&ndash;<kbd>4</kbd> <kbd>Enter</kbd></span>
+    <span class="keys">Quizzes <kbd>1</kbd>&ndash;<kbd>4</kbd> <kbd>Enter</kbd></span>
   </footer>
 
 </div>

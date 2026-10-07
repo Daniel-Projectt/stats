@@ -16,40 +16,39 @@ function li(x){ return "<li>"+x+"</li>"; }
 function renderGuide(){
   var done = getJSON("guide", {}), total = 0;
   GUIDE.sections.forEach(function(s){ total += s.items.length; });
-  var html =
-    '<div class="handout card-corners">'+CORNERS+
-      '<div class="hcourse">'+COURSE.code+' &middot; '+COURSE.term+'</div>'+
-      '<h2>'+COURSE.exam+'</h2><p class="hscope">'+COURSE.scope+'</p>'+
-      '<ul class="hrules">'+COURSE.rules.map(li).join("")+'</ul>'+
-    '</div>'+
-    '<p class="note">'+COURSE.about+'</p>'+
-    '<details class="keyterms"><summary>Which Excel formula? &mdash; 18 to try, tap each to check your answer</summary><ol>'+
-      KEYTERMS.map(function(k){ return '<li><span class="kn">'+k.n+'</span><p>'+k.q+'</p><button class="btn reveal" type="button">Show answer</button><p class="ka" hidden>'+k.a+'</p></li>'; }).join("")+
-    '</ol></details>'+
-    '<div class="gprog"><span class="count" id="gCount"></span><div class="bar"><i id="gBar" style="width:0"></i></div></div>';
+  var html = '<div class="gprog"><span class="count" id="gCount"></span><div class="bar"><i id="gBar" style="width:0"></i></div></div>';
   GUIDE.sections.forEach(function(s){
     html += '<div class="gsec"><h2>'+s.h+'</h2>'+divider();
     s.items.forEach(function(it){
-      html += '<div class="gitem'+(done[it.id] ? " ok" : "")+'" data-gi="'+it.id+'">'+
-        '<input type="checkbox" aria-label="I can explain '+strip(it.t)+'" data-g="'+it.id+'"'+(done[it.id] ? " checked" : "")+'>'+
-        '<div><div class="gt">'+it.t+'</div>'+
-          '<div class="gs">'+it.short+'</div>'+
-          '<div class="gsub">'+it.subs.map(function(sb){ return '<button class="btn" type="button" data-go="'+s.tp+'/notes" data-a="'+sb[1]+'">'+sb[0]+'</button>'; }).join("")+'</div></div>'+
-        '<button class="btn" type="button" data-go="'+s.tp+'/notes" data-a="'+it.a+'">Study it</button></div>';
+      var m = /^([\d-]+) · (.*)$/.exec(it.t);
+      html += '<div class="gitem obj'+(done[it.id] ? " ok" : "")+'" data-gi="'+it.id+'">'+
+        '<input type="checkbox" aria-label="I can do '+strip(it.t)+'" data-g="'+it.id+'"'+(done[it.id] ? " checked" : "")+'>'+
+        '<div class="gbody"><button class="gopen" type="button" aria-expanded="false"><span class="nb">'+m[1]+'</span><span class="gt">'+m[2]+'</span></button>'+
+          '<div class="gans" hidden><p class="gs"><b>In short</b>'+it.short+'</p>'+
+          '<div class="gex"><b>Example</b>'+EX[it.id].map(function(x){ return '<p>'+x+'</p>'; }).join("")+'</div></div></div></div>';
     });
     html += '</div>';
   });
   html += '<div class="gsec"><div class="toolbar">'+
-      '<button class="btn primary" type="button" data-go="exam/mock">Practice exam</button>'+
+      '<button class="btn primary" type="button" data-go="exam/mock">Practice questions</button>'+
+      '<button class="btn" type="button" id="gAll">Open all</button>'+
       '<button class="btn" type="button" id="gPrint">Print this list</button>'+
     '</div></div>';
   $("#guideRoot").innerHTML = html;
-  $$("#guideRoot .keyterms .reveal").forEach(function(b){ b.addEventListener("click", function(){ var a = b.nextElementSibling; a.hidden = !a.hidden; b.textContent = a.hidden ? "Show answer" : "Hide"; }); });
   function progress(){
     var d = getJSON("guide", {}), n = Object.keys(d).filter(function(k){ return d[k]; }).length;
     $("#gCount").innerHTML = "Ready on <b>"+n+" of "+total+"</b>";
     $("#gBar").style.width = (n/total*100) + "%";
   }
+  function setOpen(item, open){ $(".gans", item).hidden = !open; $(".gopen", item).setAttribute("aria-expanded", String(open)); }
+  $$("#guideRoot .gopen").forEach(function(b){
+    b.addEventListener("click", function(){ var item = b.closest(".gitem"); setOpen(item, $(".gans", item).hidden); });
+  });
+  $("#gAll").addEventListener("click", function(){
+    var open = $$("#guideRoot .gans").some(function(a){ return a.hidden; });
+    $$("#guideRoot .gitem").forEach(function(item){ setOpen(item, open); });
+    $("#gAll").textContent = open ? "Close all" : "Open all";
+  });
   $$("#guideRoot input[data-g]").forEach(function(cb){
     cb.addEventListener("change", function(){
       var d = getJSON("guide", {}); d[cb.getAttribute("data-g")] = cb.checked; store.set("guide", JSON.stringify(d));
@@ -57,60 +56,16 @@ function renderGuide(){
     });
   });
   $$("#guideRoot [data-go]").forEach(function(b){
-    b.addEventListener("click", function(){ goTo(b.getAttribute("data-go"), b.getAttribute("data-a")); });
+    b.addEventListener("click", function(){ goTo(b.getAttribute("data-go")); });
   });
   $("#gPrint").addEventListener("click", function(){ window.print(); });
   progress();
 }
-function goTo(path, anchor){
-  var parts = path.split("/"), t = parts[0], m = parts[1];
-  currentMode[t] = m;
-  showTopic(t);
-  if(!anchor){ window.scrollTo({top:$(".topics").offsetTop - 8, behavior:"smooth"}); return; }
-  setTimeout(function(){
-    var el = document.getElementById(anchor);
-    if(!el) return;
-    var sec = el.closest ? el.closest(".note-sec") : null;       /* the notes show one section at a time: open the right one */
-    if(sec && NOTE_OPEN[t]) NOTE_OPEN[t](sec.id, false);
-    el.scrollIntoView({behavior:"smooth", block:"start"});
-    el.classList.add("flashhit"); setTimeout(function(){ el.classList.remove("flashhit"); }, 1800);
-  }, 60);
-}
-
-/* ================================================================ chapter notes */
-/* One section on screen at a time. Pick the lesson (4-1, 4-2 …), then one of its two to four
-   sections; Previous and Next walk through the chapter in order.                              */
-var NOTE_OPEN = {};
-function lessonOf(s){ return strip(s.h).split(" · ")[0]; }
-function noteTitle(s){ return strip(s.h).replace(/“|”/g,"").replace(/^[\d-]+ · /, ""); }
-function renderNotes(tp){
-  var c = CH[tp], lessons = [];
-  c.notes.forEach(function(s){ if(lessons.indexOf(lessonOf(s)) < 0) lessons.push(lessonOf(s)); });
-  $("#"+tp+"Notes").innerHTML =
-    '<div class="lessonbar"><span class="label">Lesson</span><div class="seg lessons">'+lessons.map(function(l){ return '<button type="button" data-lesson="'+l+'" aria-pressed="false">'+l+'</button>'; }).join("")+'</div></div>'+
-    '<div class="secnav">'+c.notes.map(function(s){ return '<a href="#'+s.id+'" data-a="'+s.id+'" data-lesson="'+lessonOf(s)+'">'+noteTitle(s)+'</a>'; }).join("")+'</div>'+
-    c.notes.map(function(s, i){
-      return '<div class="note-sec" id="'+s.id+'" hidden><h2>'+s.h+'</h2>'+divider()+s.body+
-        '<div class="secstep"><button class="btn" type="button" data-step="'+(i-1)+'"'+(i === 0 ? ' disabled' : '')+'>&lsaquo; Previous</button>'+
-        '<span class="count">'+(i+1)+' of '+c.notes.length+'</span>'+
-        '<button class="btn primary" type="button" data-step="'+(i+1)+'"'+(i === c.notes.length-1 ? ' disabled' : '')+'>Next &rsaquo;</button></div></div>';
-    }).join("");
-  var root = $("#"+tp+"Notes");
-  function open(id, scroll){
-    var sec = c.notes.filter(function(s){ return s.id === id; })[0] || c.notes[0], les = lessonOf(sec);
-    $$(".note-sec", root).forEach(function(n){ n.hidden = (n.id !== sec.id); });
-    $$(".lessons button", root).forEach(function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-lesson") === les)); });
-    $$(".secnav a", root).forEach(function(a2){ a2.hidden = (a2.getAttribute("data-lesson") !== les); a2.classList.toggle("on", a2.getAttribute("data-a") === sec.id); });
-    store.set("note."+tp, sec.id);
-    if(scroll){ var top = $(".lessonbar", root); if(top && top.scrollIntoView) top.scrollIntoView({behavior:"smooth", block:"start"}); }
-  }
-  NOTE_OPEN[tp] = open;
-  $$(".lessons button", root).forEach(function(b){
-    b.addEventListener("click", function(){ var l = b.getAttribute("data-lesson"); open(c.notes.filter(function(s){ return lessonOf(s) === l; })[0].id, false); });
-  });
-  $$(".secnav a", root).forEach(function(a2){ a2.addEventListener("click", function(e){ e.preventDefault(); open(a2.getAttribute("data-a"), false); }); });
-  $$(".secstep button", root).forEach(function(b){ b.addEventListener("click", function(){ var s = c.notes[parseInt(b.getAttribute("data-step"), 10)]; if(s) open(s.id, true); }); });
-  open(store.get("note."+tp), false);
+function goTo(path){
+  var parts = path.split("/");
+  currentMode[parts[0]] = parts[1];
+  showTopic(parts[0]);
+  window.scrollTo({top:$(".topics").offsetTop - 8, behavior:"smooth"});
 }
 
 /* ================================================================ practice exam */
@@ -173,28 +128,12 @@ function renderMockSetup(){
 
 /* ================================================================ wiring */
 var engines = {};
-CHAPTERS.forEach(function(tp){
-  var seg = $('.seg[data-decks="'+tp+'"]'), cur = CH[tp].decks[0].id;
-  seg.innerHTML = CH[tp].decks.map(function(d, i){ return '<button type="button" data-deck="'+d.id+'" aria-pressed="'+(i === 0)+'">'+d.label+'</button>'; }).join("");
-  engines[tp+"Cards"] = makeCards($("#"+tp+"Cards")); engines[tp+"Cards"].load(deckFor(tp, cur));
-  segWire('.seg[data-decks="'+tp+'"]', "data-deck", function(v){ cur = v; engines[tp+"Cards"].load(deckFor(tp, v)); });
-  $('[data-shuffle="'+tp+'"]').addEventListener("click", function(){ engines[tp+"Cards"].load(deckFor(tp, cur)); });
-  engines[tp+"Match"] = makeMatch($("#"+tp+"Match"), function(){ return matchRound(tp, 6); });
-  engines[tp+"Quiz"]  = makeQuiz($("#"+tp+"Quiz"), function(){ return topicQuestions(tp, null, 10); });
-  renderNotes(tp);
-});
 renderGuide(); renderKit();
 
 var ON_SHOW = {"exam/mock":function(){ if(!engines.mock) renderMockSetup(); }};
 var KEYS = {"exam/mock":function(e){ return engines.mock ? engines.mock.keys(e) : false; }};
-CHAPTERS.forEach(function(tp){
-  ON_SHOW[tp+"/match"] = function(){ engines[tp+"Match"].ensure(); };
-  ON_SHOW[tp+"/quiz"]  = function(){ engines[tp+"Quiz"].ensure(); };
-  KEYS[tp+"/cards"] = function(e){ return engines[tp+"Cards"].keys(e); };
-  KEYS[tp+"/quiz"]  = function(e){ return engines[tp+"Quiz"].keys(e); };
-});
-var TOPICS = ["guide","kit","c4","c5","c6","exam"];
-var currentTopic = "guide", currentMode = {guide:"overview", kit:"card", c4:"notes", c5:"notes", c6:"notes", exam:"mock"};
+var TOPICS = ["guide","exam","kit"];
+var currentTopic = "guide", currentMode = {guide:"overview", kit:"card", exam:"mock"};
 function showMode(topic, mode){
   currentMode[topic] = mode;
   $$('.seg[data-modes="'+topic+'"] button').forEach(function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-mode") === mode)); });

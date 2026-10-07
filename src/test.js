@@ -208,15 +208,47 @@ ok(/<b>Correct\.<\/b>/.test(src) && /<b>Not this one\.<\/b>/.test(src), 'answer 
 
 // ---------- 8. markup ----------
 head('markup');
-ok((html.match(/class="topic-btn"/g) || []).length === 6, 'six tabs: guide, exam kit, three chapters, practice exam');
-['guide', 'kit'].concat(tps, ['exam']).forEach(t => ok(html.includes('data-topic="' + t + '"') && html.includes('id="topic-' + t + '"'), 'tab and section: ' + t));
-tps.forEach(tp => ['Notes', 'Cards', 'Match', 'Quiz'].forEach(s => ok(html.includes('id="' + tp + s + '"'), 'root exists: ' + tp + s)));
+ok((html.match(/class="topic-btn"/g) || []).length === 3, 'three tabs: objectives, practice, exam kit');
+['guide', 'exam', 'kit'].forEach(t => ok(html.includes('data-topic="' + t + '"') && html.includes('id="topic-' + t + '"'), 'tab and section: ' + t));
+ok(!/id="topic-c[456]"|id="c[456](Notes|Cards|Match|Quiz)"/.test(html), 'the chapter tabs, notes, flashcards and matching are gone');
 ok(/data-topic="guide"\s+aria-selected="true"/.test(html), 'Guide is the default tab');
 ok(html.includes('id="flourish"') && html.includes('id="emblem"') && html.includes('class="emblem"'), 'ornaments and the earth emblem present');
 ok(html.indexOf('--gold:#6b4c7c') > html.indexOf('--gold:#9a7a44'), 'the plum override comes after the gold base, so it wins');
 ok(/id="kitCard"/.test(html) && /id="kitTools"/.test(html) && /id="kitWhich"/.test(html), 'the exam kit panels exist');
 ok(html.includes('rel="manifest"') && html.includes('sw.js') && fs.existsSync(path.join(ROOT, 'sw.js')) && fs.existsSync(path.join(ROOT, 'manifest.webmanifest')), 'PWA pieces: manifest and service worker');
-ok(/\.note-sec\[hidden\]\{display:none\}/.test(html) && /\.secnav a\[hidden\]\{display:none\}/.test(html) && /\.note-sec\[hidden\]\{display:block!important\}/.test(html), 'hidden sections are hidden on screen and all printed on paper');
+// ---------- one worked example per objective, numbers recomputed here ----------
+head('one example per objective');
+{
+const allItems = A.GUIDE.sections.flatMap(s => s.items), xs = s => String(s).replace(/<[^>]+>/g, '');
+ok(allItems.length === 31 && allItems.every(it => Array.isArray(A.EX[it.id]) && A.EX[it.id].length >= 1 && A.EX[it.id].length <= 3) && Object.keys(A.EX).length === 31, 'every one of the 31 objectives has one short example', allItems.filter(it => !A.EX[it.id]).map(it => it.id).join());
+allItems.forEach(it => { const len = xs(A.EX[it.id].join(' ')).length; ok(len >= 90 && len <= 420, 'the example for ' + it.id + ' is short', len); ok(/^[\d-]+ · /.test(it.t), 'objective keeps its lesson number: ' + it.id); });
+const exHas = (id, v) => ok(xs(A.EX[id].join(' ')).includes(v), 'example ' + id + ' shows ' + v, xs(A.EX[id].join(' ')));
+const r4 = x => x.toFixed(4), fact = n => n < 2 ? 1 : n * fact(n - 1), comb = (n, r) => fact(n) / (fact(r) * fact(n - r));
+const binom = (x, n, p) => comb(n, x) * Math.pow(p, x) * Math.pow(1 - p, n - x), binomCum = (x, n, p) => { let s = 0; for (let k = 0; k <= x; k++) s += binom(k, n, p); return s; };
+const pois = (x, m) => Math.pow(m, x) * Math.exp(-m) / fact(x);
+const erf = x => { const s = x < 0 ? -1 : 1; x = Math.abs(x); const tt = 1 / (1 + 0.3275911 * x); return s * (1 - (((((1.061405429 * tt - 1.453152027) * tt) + 1.421413741) * tt - 0.284496736) * tt + 0.254829592) * tt * Math.exp(-x * x)); };
+const phi = z => 0.5 * (1 + erf(z / Math.SQRT2));
+exHas('g41-2', (13 / 52).toFixed(2)); exHas('g41-2', (30 / 600).toFixed(2));
+exHas('g42-1', (16 / 52).toFixed(3));
+exHas('g42-2', r4(4 / 52 * 4 / 52)); exHas('g42-2', r4(4 / 52 * 3 / 51));
+exHas('g43-1', r4(Math.pow(0.9, 5))); exHas('g43-1', r4(1 - Math.pow(0.9, 5))); exHas('g43-1', r4(5 * 0.1 * Math.pow(0.9, 4)));
+exHas('g43-2', (30 / 200).toFixed(2)); exHas('g43-2', (30 / 100).toFixed(2)); exHas('g43-2', (30 / 40).toFixed(2));
+exHas('g43-3', (0.9 * 0.02 / (0.9 * 0.02 + 0.05 * 0.98)).toFixed(3)); exHas('g43-4', (180 / 670).toFixed(3));
+ok(0.9 * 200 === 180 && Math.round(0.05 * 9800) === 490, 'the 10,000 table');
+exHas('g44-1', String(4 * 3)); exHas('g44-1', String(fact(5))); exHas('g44-2', String(10 * 9 * 8)); exHas('g44-2', String(comb(10, 3)));
+const xv = [0, 1, 2, 3], pv = [0.1, 0.3, 0.4, 0.2], mean = xv.reduce((s, x, i) => s + x * pv[i], 0), ex2 = xv.reduce((s, x, i) => s + x * x * pv[i], 0);
+exHas('g51-3', mean.toFixed(1)); exHas('g51-3', (ex2 - mean * mean).toFixed(2)); exHas('g51-3', Math.sqrt(ex2 - mean * mean).toFixed(1));
+ok(Math.abs(490 * 0.01 + (-10) * 0.99 - (-5)) < 1e-9, 'raffle expected value is −$5'); exHas('g51-4', '−$5');
+exHas('g52-2', r4(binom(3, 10, 0.3))); exHas('g52-2', r4(binomCum(3, 10, 0.3))); exHas('g52-2', r4(binomCum(2, 10, 0.3))); exHas('g52-2', r4(1 - binomCum(3, 10, 0.3)));
+exHas('g52-3', String(26 * 0.5)); exHas('g52-3', Math.sqrt(26 * 0.5 * 0.5).toFixed(1));
+exHas('g53-2', r4(pois(2, 4))); exHas('g53-2', r4(pois(0, 2))); exHas('g53-2', r4(1 - pois(0, 4)));
+exHas('g61-2', r4(phi(1))); exHas('g61-2', r4(1 - phi(1))); exHas('g61-2', r4(phi(1) - phi(-1)));
+exHas('g62-1', r4(phi(1))); exHas('g62-1', r4(1 - phi(2)));
+exHas('g62-2', (100 + 1.282 * 15).toFixed(1));
+exHas('g64-2', String(15 / 5)); exHas('g64-2', String(15 / 6)); exHas('g64-2', String(15 / 10));
+exHas('g64-3', r4(1 - phi(5 / 15))); exHas('g64-3', r4(1 - phi(2)));
+ok(/\.gans\[hidden\]\{display:none\}/.test(html) && /@media print\{ \.gans\[hidden\]\{display:block!important\}/.test(html), 'answers are hidden until tapped on screen, and all printed on paper');
+}
 ok(/stats-v\d+/.test(fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8')), 'the service worker has its own cache name');
 ok(/Statistics for Business/.test(fs.readFileSync(path.join(ROOT, 'manifest.webmanifest'), 'utf8')), 'the manifest is this page’s');
 ok(html.includes('og:image') && html.includes('/stats/preview.png'), 'link preview metadata');

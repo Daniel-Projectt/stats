@@ -510,6 +510,25 @@ details.work summary{font-size:12px}
   body.printkit .fct{font-size:9.5px} body.printkit .fck{font-size:7px}
   body.printkit .card-corners .c{display:none}
 }
+
+/* ---- objectives: tap one to see the answer and an example ---- */
+.gitem.obj{align-items:flex-start}
+.gitem.obj .gbody{flex:1 1 auto;min-width:0}
+.gopen{display:flex;align-items:baseline;gap:10px;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.gopen .nb{flex:0 0 auto;font-family:var(--sans);font-size:10px;letter-spacing:.14em;color:var(--gold);border:1px solid var(--gold-soft);border-radius:2px;padding:2px 6px}
+.gopen .gt{flex:1 1 auto;font-family:var(--serif);font-size:17px;line-height:1.4}
+.gopen::after{content:"+";flex:0 0 auto;font-family:var(--sans);font-size:18px;color:var(--gold);line-height:1}
+.gopen[aria-expanded="true"]::after{content:"\2212"}
+.gans{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.gans[hidden]{display:none}
+.gans b{font-weight:600}
+.gans .gs > b:first-child,.gex > b:first-child{display:block;font-family:var(--sans);font-weight:400;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.gans .gs{font-size:16px;line-height:1.55;color:var(--ink);margin:0 0 14px}
+.gex{background:var(--surface-2);border:1px solid var(--line);border-radius:3px;padding:12px 14px}
+.gex p{margin:0 0 8px;font-size:15.5px;line-height:1.55}
+.gex p:last-child{margin-bottom:0}
+.gex code{font-family:Consolas,"Courier New",monospace;font-size:.9em;overflow-wrap:anywhere}
+@media print{ .gans[hidden]{display:block!important} .gopen::after{content:""} }
 </style>
 </head>
 <body>
@@ -575,22 +594,16 @@ details.work summary{font-size:12px}
   </header>
 
   <nav class="topics" role="tablist" aria-label="Sections">
-    <button class="topic-btn" role="tab" data-topic="guide" aria-selected="true">Guide</button>
+    <button class="topic-btn" role="tab" data-topic="guide" aria-selected="true">Objectives</button>
+    <button class="topic-btn" role="tab" data-topic="exam" aria-selected="false">Practice</button>
     <button class="topic-btn" role="tab" data-topic="kit" aria-selected="false">Exam Kit</button>
-    <button class="topic-btn" role="tab" data-topic="c4" aria-selected="false">4 &middot; Probability</button>
-    <button class="topic-btn" role="tab" data-topic="c5" aria-selected="false">5 &middot; Discrete</button>
-    <button class="topic-btn" role="tab" data-topic="c6" aria-selected="false">6 &middot; Normal</button>
-    <button class="topic-btn" role="tab" data-topic="exam" aria-selected="false">Practice Exam</button>
   </nav>
 
   <main>
 
     <!-- ================= GUIDE ================= -->
     <section class="topic" id="topic-guide">
-      <p class="intro">The three &ldquo;Chapter Objectives&rdquo; sheets, objective by objective, in their own words. Check one off once you can do it without looking; <b>Study it</b> jumps to the notes. Highlighted lines are what the exam is most likely to ask.</p>
-      <div class="modes"><div class="seg" data-modes="guide">
-        <button type="button" data-mode="overview" aria-pressed="true">The objectives</button>
-      </div></div>
+      <p class="intro">The 31 objectives from the three sheets, in their own words. Tap one to see the answer in short and one worked example.</p>
       <div class="panel" data-panel="guide/overview"><div id="guideRoot"></div></div>
     </section>
 
@@ -607,69 +620,9 @@ details.work summary{font-size:12px}
       <div class="panel" data-panel="kit/which" hidden><div id="kitWhich"></div></div>
     </section>
 
-    <!-- ================= CHAPTER 4 ================= -->
-    <section class="topic" id="topic-c4" hidden>
-      <p class="intro">Chapter 4: what a probability is, the addition and multiplication rules, complements and &ldquo;at least one&rdquo;, conditional probability and Bayes&rsquo; theorem, and counting with permutations and combinations.</p>
-      <div class="modes"><div class="seg" data-modes="c4">
-        <button type="button" data-mode="notes" aria-pressed="true">Notes</button>
-        <button type="button" data-mode="cards" aria-pressed="false">Flashcards</button>
-        <button type="button" data-mode="match" aria-pressed="false">Match</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
-      </div></div>
-      <div class="panel" data-panel="c4/notes"><div id="c4Notes"></div></div>
-      <div class="panel" data-panel="c4/cards" hidden>
-        <p class="hint">Front: the term or the problem. Back: the answer and its objective. Space flips, arrows move.</p>
-        <div class="toolbar"><span class="label">Deck</span><div class="seg" data-decks="c4"></div><button class="btn" type="button" data-shuffle="c4">Shuffle deck</button></div>
-        <div id="c4Cards"></div>
-      </div>
-      <div class="panel" data-panel="c4/match" hidden><p class="hint">Tap a term or a problem, then what goes with it.</p><div id="c4Match"></div></div>
-      <div class="panel" data-panel="c4/quiz" hidden><p class="hint">Multiple choice, true/false and application questions. Keys <kbd>1</kbd>&ndash;<kbd>4</kbd> answer, <kbd>Enter</kbd> moves on.</p><div id="c4Quiz"></div></div>
-    </section>
-
-    <!-- ================= CHAPTER 5 ================= -->
-    <section class="topic" id="topic-c5" hidden>
-      <p class="intro">Chapter 5: discrete and continuous random variables, the mean and standard deviation of a distribution, expected value, the binomial distribution and the Poisson distribution, with the Excel formula for each.</p>
-      <div class="modes"><div class="seg" data-modes="c5">
-        <button type="button" data-mode="notes" aria-pressed="true">Notes</button>
-        <button type="button" data-mode="cards" aria-pressed="false">Flashcards</button>
-        <button type="button" data-mode="match" aria-pressed="false">Match</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
-      </div></div>
-      <div class="panel" data-panel="c5/notes"><div id="c5Notes"></div></div>
-      <div class="panel" data-panel="c5/cards" hidden>
-        <p class="hint">Front: the term or the problem. Back: the answer and its objective. Space flips, arrows move.</p>
-        <div class="toolbar"><span class="label">Deck</span><div class="seg" data-decks="c5"></div><button class="btn" type="button" data-shuffle="c5">Shuffle deck</button></div>
-        <div id="c5Cards"></div>
-      </div>
-      <div class="panel" data-panel="c5/match" hidden><p class="hint">Tap a term or a problem, then what goes with it.</p><div id="c5Match"></div></div>
-      <div class="panel" data-panel="c5/quiz" hidden><p class="hint">Multiple choice, true/false and application questions. Keys <kbd>1</kbd>&ndash;<kbd>4</kbd> answer, <kbd>Enter</kbd> moves on.</p><div id="c5Quiz"></div></div>
-    </section>
-
-    <!-- ================= CHAPTER 6 ================= -->
-    <section class="topic" id="topic-c6" hidden>
-      <p class="intro">Chapter 6: the standard normal curve, areas and z-scores, probabilities and cutoffs for any normal distribution, sampling distributions, the central limit theorem and the standard error, and checking for normality.</p>
-      <div class="modes"><div class="seg" data-modes="c6">
-        <button type="button" data-mode="notes" aria-pressed="true">Notes</button>
-        <button type="button" data-mode="cards" aria-pressed="false">Flashcards</button>
-        <button type="button" data-mode="match" aria-pressed="false">Match</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
-      </div></div>
-      <div class="panel" data-panel="c6/notes"><div id="c6Notes"></div></div>
-      <div class="panel" data-panel="c6/cards" hidden>
-        <p class="hint">Front: the term or the problem. Back: the answer and its objective. Space flips, arrows move.</p>
-        <div class="toolbar"><span class="label">Deck</span><div class="seg" data-decks="c6"></div><button class="btn" type="button" data-shuffle="c6">Shuffle deck</button></div>
-        <div id="c6Cards"></div>
-      </div>
-      <div class="panel" data-panel="c6/match" hidden><p class="hint">Tap a term or a problem, then what goes with it.</p><div id="c6Match"></div></div>
-      <div class="panel" data-panel="c6/quiz" hidden><p class="hint">Multiple choice, true/false and application questions. Keys <kbd>1</kbd>&ndash;<kbd>4</kbd> answer, <kbd>Enter</kbd> moves on.</p><div id="c6Quiz"></div></div>
-    </section>
-
     <!-- ================= PRACTICE EXAM ================= -->
     <section class="topic" id="topic-exam" hidden>
       <p class="intro">Questions from all three chapters, built on the objectives: computations, which-formula questions, and the &ldquo;explain why&rdquo; ideas. Reshuffled each run, with the reason behind every answer.</p>
-      <div class="modes"><div class="seg" data-modes="exam">
-        <button type="button" data-mode="mock" aria-pressed="true">Practice exam</button>
-      </div></div>
       <div class="panel" data-panel="exam/mock"><div id="mockExam"></div></div>
     </section>
 
@@ -677,7 +630,7 @@ details.work summary{font-size:12px}
 
   <footer>
     <p>Built from the Statistics for Business &ldquo;Chapter 4, 5 and 6 Objectives&rdquo; sheets. Section numbers follow Triola, <i>Elementary Statistics</i>. The exam tools are the Normal Distribution Explorer and the Sampling Distribution Explorer at tools.benhartlage.com.</p>
-    <span class="keys">Flashcards <kbd>&larr;</kbd> <kbd>&rarr;</kbd> <kbd>Space</kbd> &nbsp;&middot;&nbsp; Quizzes <kbd>1</kbd>&ndash;<kbd>4</kbd> <kbd>Enter</kbd></span>
+    <span class="keys">Quizzes <kbd>1</kbd>&ndash;<kbd>4</kbd> <kbd>Enter</kbd></span>
   </footer>
 
 </div>
@@ -861,6 +814,41 @@ var KIT = {
   ["normal, one value, “what probability”", "Normal → probability", "Normal Explorer or =NORM.DIST"],
   ["normal, “what value”, percentile, top 5%", "Normal → cutoff", "Normal Explorer or =NORM.INV"],
   ["“a sample of n… the mean is”", "Sample mean", "same, but σ ÷ √n"]]
+};
+
+/* One worked example per objective, with the same numbers the chapter files use (test.js recomputes them). */
+var EX = {
+ "g41-1":["Roll one die. <b>Sample space:</b> {1, 2, 3, 4, 5, 6}. <b>One outcome:</b> “a 4”. <b>An event:</b> “an even number” = {2, 4, 6}.", "P(rolling a 7) = <b>0</b>, impossible. P(rolling below 7) = <b>1</b>, certain."],
+ "g41-2":["<b>Equally likely:</b> P(heart from a deck) = 13 ÷ 52 = <b>0.25</b>.", "<b>Past data:</b> 30 of 600 orders were returned → 30 ÷ 600 = <b>0.05</b>.", "<b>Judgment:</b> “a 70% chance our new store breaks even.”"],
+ "g41-3":["Flip a coin 10 times and you might see 70% heads. Flip it 10,000 times and you will be very near 50%.", "After five heads in a row, the next flip is still <b>0.5</b>. Tails is not “due”."],
+ "g42-1":["One card: P(king or heart). Kings 4, hearts 13, and the king of hearts is in both.", "(4 + 13 − 1) ÷ 52 = 16 ÷ 52 = <b>0.308</b>."],
+ "g42-2":["Two aces <b>with</b> replacement (independent): 4/52 × 4/52 = <b>0.0059</b>.", "Two aces <b>without</b> replacement (dependent): 4/52 × 3/51 = <b>0.0045</b>."],
+ "g43-1":["Each of 5 parts has a 10% chance of being defective. P(none) = 0.9⁵ = 0.5905, so P(at least one) = 1 − 0.5905 = <b>0.4095</b>.", "Exactly one is a smaller event: 5 × 0.1 × 0.9⁴ = <b>0.3281</b>."],
+ "g43-2":["200 orders: 100 online (30 returned) and 100 in store (10 returned).", "<b>Joint:</b> P(online and returned) = 30 ÷ 200 = <b>0.15</b>.", "<b>Conditional:</b> P(returned given online) = 30 ÷ 100 = <b>0.30</b>. The other way round, P(online given returned) = 30 ÷ 40 = <b>0.75</b>."],
+ "g43-3":["2% of transactions are fraud. The system flags 90% of fraud and 5% of honest ones. A transaction is flagged.", "P(fraud given flag) = (0.90 × 0.02) ÷ (0.90 × 0.02 + 0.05 × 0.98) = 0.018 ÷ 0.067 = <b>0.269</b>.", "P(flag given fraud) = 0.90 is a different question."],
+ "g43-4":["Same system, 10,000 transactions: 200 fraud and 9,800 honest. Flagged: 90% of 200 = 180, and 5% of 9,800 = 490.", "180 ÷ (180 + 490) = 180 ÷ 670 = <b>0.269</b>. In Excel: <code>=0.9*0.02/(0.9*0.02+0.05*0.98)</code>.", "Fraud is rare, so most flags are false alarms: look again before acting."],
+ "g44-1":["4 shirts and 3 pants → 4 × 3 = <b>12</b> outfits.", "5 people in a line → 5! = 5 × 4 × 3 × 2 × 1 = <b>120</b>. In Excel <code>=FACT(5)</code>."],
+ "g44-2":["From 10 people. A president, a VP and a treasurer (order matters): 10 × 9 × 8 = <b>720</b>, <code>=PERMUT(10,3)</code>.", "A committee of 3 (order does not matter): 720 ÷ 3! = <b>120</b>, <code>=COMBIN(10,3)</code>."],
+ "g51-1":["“The number of defects in a box” is <b>discrete</b>: you count it. “The time for a bulb to burn out” is <b>continuous</b>: you measure it.", "The variable is the rule, x = the number of defects. One value is x = 3."],
+ "g51-2":["x = 0, 1, 2, 3 with P(x) = 0.1, 0.3, 0.4, 0.2.", "The values are numbers ✓, each probability is between 0 and 1 ✓, and 0.1 + 0.3 + 0.4 + 0.2 = <b>1</b> ✓. Valid."],
+ "g51-3":["x = 0, 1, 2, 3 with P(x) = 0.1, 0.3, 0.4, 0.2.", "Mean = 0(0.1) + 1(0.3) + 2(0.4) + 3(0.2) = <b>1.7</b>.", "Variance = 3.7 − 1.7² = <b>0.81</b> (squared units). Standard deviation = √0.81 = <b>0.9</b> (original units)."],
+ "g51-4":["A $10 raffle ticket has a 1% chance to win $500. Expected value = 490(0.01) + (−10)(0.99) = <b>−$5</b> per ticket, on average. No single ticket loses $5.", "A sure $100 and a 50/50 chance at $200 or $0 both have an expected value of $100, but standard deviations of <b>0</b> and <b>$100</b>."],
+ "g52-1":["10 customers, each with a 30% chance of buying. The trial is one customer; a success is a purchase.", "<b>n = 10</b>, <b>p = 0.3</b>, x = the number who buy. Fixed n ✓, independent ✓, two outcomes ✓, same p ✓."],
+ "g52-2":["n = 10, p = 0.3.", "Exactly 3: <code>=BINOM.DIST(3,10,0.3,FALSE)</code> = <b>0.2668</b>. At most 3: <code>=BINOM.DIST(3,10,0.3,TRUE)</code> = <b>0.6496</b>.", "Fewer than 3: <code>=BINOM.DIST(2,10,0.3,TRUE)</code> = <b>0.3828</b>. At least 4: <code>=1-BINOM.DIST(3,10,0.3,TRUE)</code> = <b>0.3504</b>."],
+ "g52-3":["26 births, p = 0.5.", "Mean = 26 × 0.5 = <b>13</b>. Standard deviation = √(26 × 0.5 × 0.5) = √6.5 = <b>2.5</b>."],
+ "g53-1":["<b>Fits:</b> customers arriving at a steady 4 per hour. <b>Does not fit:</b> arrivals that surge at lunch, or people arriving in groups.", "“How many calls in an hour?” is a count: Poisson. “How long until the next call?” is a waiting time: not Poisson."],
+ "g53-2":["A store gets 4 customers per hour. In half an hour the mean is 4 × 0.5 = <b>2</b>.", "Exactly 2 in an hour: <code>=POISSON.DIST(2,4,FALSE)</code> = <b>0.1465</b>. None in half an hour: <code>=POISSON.DIST(0,2,FALSE)</code> = <b>0.1353</b>.", "At least 1 in an hour: <code>=1-POISSON.DIST(0,4,TRUE)</code> = <b>0.9817</b>."],
+ "g53-3":["Mean 4 per hour → variance <b>4</b>, standard deviation √4 = <b>2</b>.", "“10 customers, how many buy” has a clear n: binomial, and x stops at 10. “Calls in an hour” has no number of trials: Poisson, with no upper limit."],
+ "g61-1":["z = 1.5 means 1.5 standard deviations above the mean. The area left of −1 equals the area right of +1.", "The chance of one exact value is <b>0</b>; only a range has a probability, the area above it."],
+ "g61-2":["Left of z = 1.00: <b>0.8413</b>. Right of it: 1 − 0.8413 = <b>0.1587</b>. Between −1 and 1: 0.8413 − 0.1587 = <b>0.6827</b>.", "Backwards: the 95th percentile is <code>=NORM.S.INV(0.95)</code> = <b>1.645</b>."],
+ "g62-1":["Test scores are normal with mean 100 and standard deviation 15.", "Below 115: z = (115 − 100) ÷ 15 = 1.00 → <b>0.8413</b>. About 84% score below 115. <code>=NORM.DIST(115,100,15,TRUE)</code>", "Above 130: z = 2.00 → 1 − 0.9772 = <b>0.0228</b>."],
+ "g62-2":["Mean 100, standard deviation 15. What score marks the top 10%?", "Top 10% means 0.90 to the left. z = 1.282, so x = 100 + 1.282 × 15 = <b>119.2</b>. In one step: <code>=NORM.INV(0.90,100,15)</code>."],
+ "g63-1":["All students’ scores: the <b>population</b>, with mean μ. The 36 scores you drew: one <b>sample</b>, with mean x̄. The x̄ from every possible sample of 36: the <b>sampling distribution</b>.", "μ is a parameter; x̄ is a statistic."],
+ "g63-2":["Think of darts. <b>Bias</b>: the whole cluster sits away from the bullseye. <b>Variability</b>: how spread out the cluster is.", "The sample mean is unbiased: right on average, not in every sample. A larger sample shrinks variability; it does not fix bias."],
+ "g64-1":["Take a right-skewed population. With n = 2 the pile of sample means is still lopsided; with n = 30 it is bell-shaped.", "The population itself has not changed: only the means become normal."],
+ "g64-2":["σ = 15. n = 25 → 15 ÷ 5 = <b>3</b>. n = 36 → 15 ÷ 6 = <b>2.5</b>. n = 100 → 15 ÷ 10 = <b>1.5</b>.", "To cut the standard error in half you need four times the sample size."],
+ "g64-3":["Scores are normal with μ = 100 and σ = 15.", "One person above 105: z = (105 − 100) ÷ 15 = 0.33 → <b>0.3694</b>.", "The mean of 36 people above 105: standard error 15 ÷ √36 = 2.5, z = 2.00 → <b>0.0228</b>. <code>=1-NORM.DIST(105,100,15/SQRT(36),TRUE)</code>"],
+ "g65-1":["A bell-shaped histogram and quantile-plot points close to a straight line <b>support</b> a normal model.", "An S-shaped curve, or points far off the line, <b>raise concerns</b>. Either way the graphs are not proof."]
 };
 
 /* ================================================================ Chapter 4 · Probability */
@@ -1794,7 +1782,7 @@ function matchRound(tp, n){
 
 /* ---- the pure parts can be tested outside a browser ---- */
 if(typeof window === "undefined"){
-  module.exports = {CH:CH, COURSE:COURSE, GUIDE:GUIDE, KEYTERMS:KEYTERMS, KIT:KIT,
+  module.exports = {CH:CH, COURSE:COURSE, GUIDE:GUIDE, EX:EX, KEYTERMS:KEYTERMS, KIT:KIT,
     QB:QB, PAIRSETS:PAIRSETS, VERDICTS:VERDICTS, CHAPTERS:CHAPTERS, TOPIC_NAMES:TOPIC_NAMES, SEC_TITLES:SEC_TITLES, SEC_CHAPTER:SEC_CHAPTER,
     finalFifty:finalFifty, meaningOf:meaningOf, sameThing:sameThing,
     fromBank:fromBank, fromPair:fromPair, topicQuestions:topicQuestions, mockQuestions:mockQuestions, questionsByKeys:questionsByKeys,
@@ -2006,40 +1994,39 @@ function li(x){ return "<li>"+x+"</li>"; }
 function renderGuide(){
   var done = getJSON("guide", {}), total = 0;
   GUIDE.sections.forEach(function(s){ total += s.items.length; });
-  var html =
-    '<div class="handout card-corners">'+CORNERS+
-      '<div class="hcourse">'+COURSE.code+' &middot; '+COURSE.term+'</div>'+
-      '<h2>'+COURSE.exam+'</h2><p class="hscope">'+COURSE.scope+'</p>'+
-      '<ul class="hrules">'+COURSE.rules.map(li).join("")+'</ul>'+
-    '</div>'+
-    '<p class="note">'+COURSE.about+'</p>'+
-    '<details class="keyterms"><summary>Which Excel formula? &mdash; 18 to try, tap each to check your answer</summary><ol>'+
-      KEYTERMS.map(function(k){ return '<li><span class="kn">'+k.n+'</span><p>'+k.q+'</p><button class="btn reveal" type="button">Show answer</button><p class="ka" hidden>'+k.a+'</p></li>'; }).join("")+
-    '</ol></details>'+
-    '<div class="gprog"><span class="count" id="gCount"></span><div class="bar"><i id="gBar" style="width:0"></i></div></div>';
+  var html = '<div class="gprog"><span class="count" id="gCount"></span><div class="bar"><i id="gBar" style="width:0"></i></div></div>';
   GUIDE.sections.forEach(function(s){
     html += '<div class="gsec"><h2>'+s.h+'</h2>'+divider();
     s.items.forEach(function(it){
-      html += '<div class="gitem'+(done[it.id] ? " ok" : "")+'" data-gi="'+it.id+'">'+
-        '<input type="checkbox" aria-label="I can explain '+strip(it.t)+'" data-g="'+it.id+'"'+(done[it.id] ? " checked" : "")+'>'+
-        '<div><div class="gt">'+it.t+'</div>'+
-          '<div class="gs">'+it.short+'</div>'+
-          '<div class="gsub">'+it.subs.map(function(sb){ return '<button class="btn" type="button" data-go="'+s.tp+'/notes" data-a="'+sb[1]+'">'+sb[0]+'</button>'; }).join("")+'</div></div>'+
-        '<button class="btn" type="button" data-go="'+s.tp+'/notes" data-a="'+it.a+'">Study it</button></div>';
+      var m = /^([\d-]+) · (.*)$/.exec(it.t);
+      html += '<div class="gitem obj'+(done[it.id] ? " ok" : "")+'" data-gi="'+it.id+'">'+
+        '<input type="checkbox" aria-label="I can do '+strip(it.t)+'" data-g="'+it.id+'"'+(done[it.id] ? " checked" : "")+'>'+
+        '<div class="gbody"><button class="gopen" type="button" aria-expanded="false"><span class="nb">'+m[1]+'</span><span class="gt">'+m[2]+'</span></button>'+
+          '<div class="gans" hidden><p class="gs"><b>In short</b>'+it.short+'</p>'+
+          '<div class="gex"><b>Example</b>'+EX[it.id].map(function(x){ return '<p>'+x+'</p>'; }).join("")+'</div></div></div></div>';
     });
     html += '</div>';
   });
   html += '<div class="gsec"><div class="toolbar">'+
-      '<button class="btn primary" type="button" data-go="exam/mock">Practice exam</button>'+
+      '<button class="btn primary" type="button" data-go="exam/mock">Practice questions</button>'+
+      '<button class="btn" type="button" id="gAll">Open all</button>'+
       '<button class="btn" type="button" id="gPrint">Print this list</button>'+
     '</div></div>';
   $("#guideRoot").innerHTML = html;
-  $$("#guideRoot .keyterms .reveal").forEach(function(b){ b.addEventListener("click", function(){ var a = b.nextElementSibling; a.hidden = !a.hidden; b.textContent = a.hidden ? "Show answer" : "Hide"; }); });
   function progress(){
     var d = getJSON("guide", {}), n = Object.keys(d).filter(function(k){ return d[k]; }).length;
     $("#gCount").innerHTML = "Ready on <b>"+n+" of "+total+"</b>";
     $("#gBar").style.width = (n/total*100) + "%";
   }
+  function setOpen(item, open){ $(".gans", item).hidden = !open; $(".gopen", item).setAttribute("aria-expanded", String(open)); }
+  $$("#guideRoot .gopen").forEach(function(b){
+    b.addEventListener("click", function(){ var item = b.closest(".gitem"); setOpen(item, $(".gans", item).hidden); });
+  });
+  $("#gAll").addEventListener("click", function(){
+    var open = $$("#guideRoot .gans").some(function(a){ return a.hidden; });
+    $$("#guideRoot .gitem").forEach(function(item){ setOpen(item, open); });
+    $("#gAll").textContent = open ? "Close all" : "Open all";
+  });
   $$("#guideRoot input[data-g]").forEach(function(cb){
     cb.addEventListener("change", function(){
       var d = getJSON("guide", {}); d[cb.getAttribute("data-g")] = cb.checked; store.set("guide", JSON.stringify(d));
@@ -2047,60 +2034,16 @@ function renderGuide(){
     });
   });
   $$("#guideRoot [data-go]").forEach(function(b){
-    b.addEventListener("click", function(){ goTo(b.getAttribute("data-go"), b.getAttribute("data-a")); });
+    b.addEventListener("click", function(){ goTo(b.getAttribute("data-go")); });
   });
   $("#gPrint").addEventListener("click", function(){ window.print(); });
   progress();
 }
-function goTo(path, anchor){
-  var parts = path.split("/"), t = parts[0], m = parts[1];
-  currentMode[t] = m;
-  showTopic(t);
-  if(!anchor){ window.scrollTo({top:$(".topics").offsetTop - 8, behavior:"smooth"}); return; }
-  setTimeout(function(){
-    var el = document.getElementById(anchor);
-    if(!el) return;
-    var sec = el.closest ? el.closest(".note-sec") : null;       /* the notes show one section at a time: open the right one */
-    if(sec && NOTE_OPEN[t]) NOTE_OPEN[t](sec.id, false);
-    el.scrollIntoView({behavior:"smooth", block:"start"});
-    el.classList.add("flashhit"); setTimeout(function(){ el.classList.remove("flashhit"); }, 1800);
-  }, 60);
-}
-
-/* ================================================================ chapter notes */
-/* One section on screen at a time. Pick the lesson (4-1, 4-2 …), then one of its two to four
-   sections; Previous and Next walk through the chapter in order.                              */
-var NOTE_OPEN = {};
-function lessonOf(s){ return strip(s.h).split(" · ")[0]; }
-function noteTitle(s){ return strip(s.h).replace(/“|”/g,"").replace(/^[\d-]+ · /, ""); }
-function renderNotes(tp){
-  var c = CH[tp], lessons = [];
-  c.notes.forEach(function(s){ if(lessons.indexOf(lessonOf(s)) < 0) lessons.push(lessonOf(s)); });
-  $("#"+tp+"Notes").innerHTML =
-    '<div class="lessonbar"><span class="label">Lesson</span><div class="seg lessons">'+lessons.map(function(l){ return '<button type="button" data-lesson="'+l+'" aria-pressed="false">'+l+'</button>'; }).join("")+'</div></div>'+
-    '<div class="secnav">'+c.notes.map(function(s){ return '<a href="#'+s.id+'" data-a="'+s.id+'" data-lesson="'+lessonOf(s)+'">'+noteTitle(s)+'</a>'; }).join("")+'</div>'+
-    c.notes.map(function(s, i){
-      return '<div class="note-sec" id="'+s.id+'" hidden><h2>'+s.h+'</h2>'+divider()+s.body+
-        '<div class="secstep"><button class="btn" type="button" data-step="'+(i-1)+'"'+(i === 0 ? ' disabled' : '')+'>&lsaquo; Previous</button>'+
-        '<span class="count">'+(i+1)+' of '+c.notes.length+'</span>'+
-        '<button class="btn primary" type="button" data-step="'+(i+1)+'"'+(i === c.notes.length-1 ? ' disabled' : '')+'>Next &rsaquo;</button></div></div>';
-    }).join("");
-  var root = $("#"+tp+"Notes");
-  function open(id, scroll){
-    var sec = c.notes.filter(function(s){ return s.id === id; })[0] || c.notes[0], les = lessonOf(sec);
-    $$(".note-sec", root).forEach(function(n){ n.hidden = (n.id !== sec.id); });
-    $$(".lessons button", root).forEach(function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-lesson") === les)); });
-    $$(".secnav a", root).forEach(function(a2){ a2.hidden = (a2.getAttribute("data-lesson") !== les); a2.classList.toggle("on", a2.getAttribute("data-a") === sec.id); });
-    store.set("note."+tp, sec.id);
-    if(scroll){ var top = $(".lessonbar", root); if(top && top.scrollIntoView) top.scrollIntoView({behavior:"smooth", block:"start"}); }
-  }
-  NOTE_OPEN[tp] = open;
-  $$(".lessons button", root).forEach(function(b){
-    b.addEventListener("click", function(){ var l = b.getAttribute("data-lesson"); open(c.notes.filter(function(s){ return lessonOf(s) === l; })[0].id, false); });
-  });
-  $$(".secnav a", root).forEach(function(a2){ a2.addEventListener("click", function(e){ e.preventDefault(); open(a2.getAttribute("data-a"), false); }); });
-  $$(".secstep button", root).forEach(function(b){ b.addEventListener("click", function(){ var s = c.notes[parseInt(b.getAttribute("data-step"), 10)]; if(s) open(s.id, true); }); });
-  open(store.get("note."+tp), false);
+function goTo(path){
+  var parts = path.split("/");
+  currentMode[parts[0]] = parts[1];
+  showTopic(parts[0]);
+  window.scrollTo({top:$(".topics").offsetTop - 8, behavior:"smooth"});
 }
 
 /* ================================================================ practice exam */
@@ -2163,28 +2106,12 @@ function renderMockSetup(){
 
 /* ================================================================ wiring */
 var engines = {};
-CHAPTERS.forEach(function(tp){
-  var seg = $('.seg[data-decks="'+tp+'"]'), cur = CH[tp].decks[0].id;
-  seg.innerHTML = CH[tp].decks.map(function(d, i){ return '<button type="button" data-deck="'+d.id+'" aria-pressed="'+(i === 0)+'">'+d.label+'</button>'; }).join("");
-  engines[tp+"Cards"] = makeCards($("#"+tp+"Cards")); engines[tp+"Cards"].load(deckFor(tp, cur));
-  segWire('.seg[data-decks="'+tp+'"]', "data-deck", function(v){ cur = v; engines[tp+"Cards"].load(deckFor(tp, v)); });
-  $('[data-shuffle="'+tp+'"]').addEventListener("click", function(){ engines[tp+"Cards"].load(deckFor(tp, cur)); });
-  engines[tp+"Match"] = makeMatch($("#"+tp+"Match"), function(){ return matchRound(tp, 6); });
-  engines[tp+"Quiz"]  = makeQuiz($("#"+tp+"Quiz"), function(){ return topicQuestions(tp, null, 10); });
-  renderNotes(tp);
-});
 renderGuide(); renderKit();
 
 var ON_SHOW = {"exam/mock":function(){ if(!engines.mock) renderMockSetup(); }};
 var KEYS = {"exam/mock":function(e){ return engines.mock ? engines.mock.keys(e) : false; }};
-CHAPTERS.forEach(function(tp){
-  ON_SHOW[tp+"/match"] = function(){ engines[tp+"Match"].ensure(); };
-  ON_SHOW[tp+"/quiz"]  = function(){ engines[tp+"Quiz"].ensure(); };
-  KEYS[tp+"/cards"] = function(e){ return engines[tp+"Cards"].keys(e); };
-  KEYS[tp+"/quiz"]  = function(e){ return engines[tp+"Quiz"].keys(e); };
-});
-var TOPICS = ["guide","kit","c4","c5","c6","exam"];
-var currentTopic = "guide", currentMode = {guide:"overview", kit:"card", c4:"notes", c5:"notes", c6:"notes", exam:"mock"};
+var TOPICS = ["guide","exam","kit"];
+var currentTopic = "guide", currentMode = {guide:"overview", kit:"card", exam:"mock"};
 function showMode(topic, mode){
   currentMode[topic] = mode;
   $$('.seg[data-modes="'+topic+'"] button').forEach(function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-mode") === mode)); });

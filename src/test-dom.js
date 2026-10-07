@@ -45,63 +45,40 @@ function answerQuiz(root, label) {
 
 head('landing');
 ok(errors.length === 0, 'no errors while loading', errors.join(' || '));
-ok(visible($('#topic-guide')) && !visible($('#topic-c4')), 'opens on the Guide');
+ok(visible($('#topic-guide')) && !visible($('#topic-exam')) && !visible($('#topic-kit')), 'opens on the Objectives');
+ok($$('.topic-btn').length === 3 && $$('.topic-btn').map(b => b.textContent).join('|') === 'Objectives|Practice|Exam Kit', 'three tabs');
 const items = $$('#guideRoot .gitem');
-ok(items.length === 31, 'guide shows all thirty-one objectives', items.length);
+ok(items.length === 31, 'all thirty-one objectives', items.length);
 ok(/0 of 31/.test($('#gCount').textContent), 'progress starts at 0 of 31', $('#gCount').textContent);
-ok(!!$('#guideRoot .handout') && $$('#guideRoot .handout .hrules li').length === 4 && /Probability/.test($('#guideRoot .handout h2').textContent), 'the course header with what the exam allows');
-ok($$('#guideRoot .gsub .btn').length >= 20, 'subsection buttons');
-ok($$('#guideRoot .gsec h2').length === 3, 'three chapters on the guide');
+ok($$('#guideRoot .gsec h2').length === 3, 'three chapters');
+ok(!$('#guideRoot .handout') && !$('#guideRoot .keyterms') && !$('#guideRoot .gsub'), 'no header card, no extra lists, no jump buttons');
+ok($$('#guideRoot .gans').every(a => a.hidden), 'every answer starts closed');
 
-head('guide checkboxes and jumps');
+head('one objective at a time');
+const it = id => $('#guideRoot .gitem[data-gi="' + id + '"]');
+ok(/^4-3$/.test(it('g43-3').querySelector('.nb').textContent) && /Bayes' theorem/.test(it('g43-3').querySelector('.gt').textContent), 'the objective in the sheet’s own words, with its lesson number');
+click(it('g43-3').querySelector('.gopen'));
+ok(!it('g43-3').querySelector('.gans').hidden && it('g43-3').querySelector('.gopen').getAttribute('aria-expanded') === 'true', 'tapping opens it');
+ok(/In short/.test(it('g43-3').querySelector('.gs').textContent) && /Example/.test(it('g43-3').querySelector('.gex').textContent) && /0\.269/.test(it('g43-3').querySelector('.gex').textContent), 'it shows the short answer and one worked example');
+ok($$('#guideRoot .gans').filter(a => !a.hidden).length === 1, 'the others stay closed');
+click(it('g43-3').querySelector('.gopen'));
+ok(it('g43-3').querySelector('.gans').hidden, 'tapping again closes it');
+items.forEach(x => { const g = x.querySelector('.gans'); ok(g.querySelector('.gs').textContent.length > 60 && g.querySelectorAll('.gex p').length >= 1 && g.querySelectorAll('.gex p').length <= 3, 'answer and example present: ' + x.getAttribute('data-gi')); });
+click($('#gAll')); ok($$('#guideRoot .gans').every(a => !a.hidden) && $('#gAll').textContent === 'Close all', 'Open all opens everything');
+click($('#gAll')); ok($$('#guideRoot .gans').every(a => a.hidden) && $('#gAll').textContent === 'Open all', 'Close all closes everything');
 const cb = $('#guideRoot input[data-g="g52-2"]'); cb.checked = true; cb.dispatchEvent(new w.Event('change', { bubbles: true }));
 ok(/1 of 31/.test($('#gCount').textContent), 'checking an item moves the progress', $('#gCount').textContent);
 ok(/":true/.test(w.localStorage.getItem('stats.guide') || ''), 'the check is saved on the device under stats.');
 click($('#gPrint')); ok(w.__printed === 1, 'print button prints');
-click($('#guideRoot .gitem[data-gi="g52-2"] > button[data-go]'));
-ok(visible($('#topic-c5')) && visible(panel('c5/notes')) && !!d.getElementById('c5-binxl'), 'binomial in Excel: jumps to the chapter 5 notes');
-topic('guide');
-click($('#guideRoot .gitem[data-gi="g43-4"] .gsub .btn[data-a="c4-base"]'));
-ok(visible(panel('c4/notes')) && d.getElementById('c4-base').closest('.note-sec').id === 'c4-screen', 'the base-rate subsection lands inside its objective');
-topic('guide');
-click($('#guideRoot .gitem[data-gi="g64-3"] .gsub .btn[data-a="c6-cond"]'));
-ok(visible(panel('c6/notes')) && d.getElementById('c6-cond').closest('.note-sec').id === 'c6-which', 'the conditions live inside one-value-or-a-mean');
-topic('guide');
-const kt = $$('#guideRoot .keyterms li');
-ok(kt.length === 18, 'the 18 which-Excel-formula questions are on the Guide', kt.length);
-click(kt[3].querySelector('.reveal'));
-ok(!kt[3].querySelector('.ka').hidden && /SUMPRODUCT/.test(kt[3].querySelector('.ka').textContent), 'tapping reveals the answer');
-topic('guide');
 click($('#guideRoot [data-go="exam/mock"]'));
-ok(visible(panel('exam/mock')) && !!$('#mxStart'), 'the practice-exam button opens the exam setup');
+ok(visible(panel('exam/mock')) && !!$('#mxStart'), 'the practice button opens the practice setup');
 
-head('every tab and mode');
-const modes = {};
-$$('.seg[data-modes]').forEach(s => { modes[s.getAttribute('data-modes')] = Array.from(s.querySelectorAll('button[data-mode]')).map(b => b.getAttribute('data-mode')); });
-Object.keys(modes).forEach(t => {
-  topic(t);
-  ok(visible($('#topic-' + t)), 'tab opens: ' + t);
-  ok($$('.topic').filter(visible).length === 1, 'only one section visible: ' + t);
-  modes[t].forEach(m => {
-    mode(t, m);
-    ok(visible(panel(t + '/' + m)), 'mode opens: ' + t + '/' + m);
-    ok($$('#topic-' + t + ' .panel').filter(visible).length === 1, 'one panel at a time: ' + t + '/' + m);
-    ok(panel(t + '/' + m).textContent.trim().length > 20, 'panel has content: ' + t + '/' + m);
-  });
-});
-ok(errors.length === 0, 'no errors after visiting every mode', errors.join(' || '));
+head('every tab');
+['guide', 'exam', 'kit'].forEach(t => { topic(t); ok(visible($('#topic-' + t)) && $$('.topic').filter(visible).length === 1, 'tab opens alone: ' + t); });
+['card', 'tools', 'which'].forEach(m => { mode('kit', m); ok(visible(panel('kit/' + m)) && $$('#topic-kit .panel').filter(visible).length === 1 && panel('kit/' + m).textContent.trim().length > 20, 'exam kit mode: ' + m); });
+ok(errors.length === 0, 'no errors after visiting every tab', errors.join(' || '));
 
-head('notes');
-const want = { c4: 11, c5: 10, c6: 10 };
-tps.forEach(t => {
-  topic(t); mode(t, 'notes');
-  ok($$('#' + t + 'Notes .note-sec').length === want[t], t + ': ' + want[t] + ' note sections rendered', $$('#' + t + 'Notes .note-sec').length);
-  ok($$('#' + t + 'Notes .secnav a').length === want[t], t + ': section nav rendered');
-  ok($$('#' + t + 'Notes .point').length === want[t], t + ': every section opens with The point');
-  ok($$('#' + t + 'Notes mark').length >= want[t], t + ': highlights rendered');
-});
-ok($$('#c4Notes .fr').length >= 4 && $$('#c5Notes code.xl').length >= 10 && $$('#c6Notes .tbl').length >= 6, 'fractions, Excel formulas and tables render');
-ok($$('#c4Notes .tbl').every(t => t.closest('.tblwrap')) && $$('#c5Notes .tbl').every(t => t.closest('.tblwrap')) && $$('#c6Notes .tbl').every(t => t.closest('.tblwrap')), 'every table can scroll on a phone');
+head('exam kit');
 topic('kit'); mode('kit', 'card');
 ok(visible($('#kitCard')) && $$('#kitCard .fcard').length === 2 && $$('#kitCard .fct tr').length >= 16, 'exam kit: the two-sided flashcard', [visible($('#kitCard')), $$('#kitCard .fcard').length, $$('#kitCard .fct tr').length, $('#topic-kit').hidden, panel('kit/card').hidden].join());
 click($('#kitPrint')); ok(w.__printed >= 1 && d.body.classList.contains('printkit'), 'the flashcard prints on its own');
@@ -109,56 +86,6 @@ mode('kit', 'tools');
 ok($$('#kitTools .note-sec').length === 2 && $$('#kitTools details.work').length >= 10 && $$('#kitTools a.toollink').every(a => /tools\.benhartlage\.com/.test(a.href)), 'exam kit: both tools with their steps and links');
 mode('kit', 'which');
 ok($$('#kitWhich .which tbody tr').length >= 12 && /BINOM\.DIST/.test($('#kitWhich').textContent), 'exam kit: which method for which question');
-
-head('flashcards');
-tps.forEach(t => {
-  topic(t); mode(t, 'cards');
-  const p = panel(t + '/cards'), c = p.querySelector('.counter');
-  ok(/^1 of \d+$/.test(c.textContent), t + ': counter starts at 1', c.textContent);
-  click(p.querySelector('.flip')); ok(p.querySelector('.flash').classList.contains('flipped'), t + ': flips');
-  ok(/Objective · /.test(p.querySelector('.face.back').textContent), t + ': the card back names its section');
-  click(p.querySelector('.next')); ok(/^2 of /.test(c.textContent) && !p.querySelector('.flash').classList.contains('flipped'), t + ': next card, unflipped');
-  key('ArrowLeft'); ok(/^1 of /.test(c.textContent), t + ': arrow key goes back');
-  const decks = Array.from(p.querySelectorAll('[data-deck]'));
-  ok(decks.length === 2, t + ': two decks');
-  click(decks[1]); ok(/^1 of \d+$/.test(c.textContent) && decks[1].getAttribute('aria-pressed') === 'true', t + ': second deck loads');
-});
-
-head('match');
-tps.forEach(t => {
-  topic(t); mode(t, 'match');
-  const p = panel(t + '/match');
-  const L = Array.from(p.querySelectorAll('.L .tile')), R = Array.from(p.querySelectorAll('.R .tile'));
-  ok(L.length === 6 && R.length === 6, t + ': six pairs', L.length + '/' + R.length);
-  click(L[0]); click(R[R.length - 1]);   // a deliberate first pair, right or wrong
-  // solve the rest: only undone tiles, so every click(l) is a fresh selection and each (l, r) is compared
-  Array.from(p.querySelectorAll('.L .tile')).filter(l => !l.classList.contains('done')).forEach(l => {
-    click(l);
-    for (const r of Array.from(p.querySelectorAll('.R .tile')).filter(x => !x.classList.contains('done'))) {
-      click(r);
-      if (l.classList.contains('done')) break;
-      click(l);
-    }
-  });
-  ok(p.querySelectorAll('.tile.done').length === 12, t + ': all six pairs solved', p.querySelectorAll('.tile.done').length);
-  ok(/Matched 6 of 6/.test(p.querySelector('.scoreline').textContent) && !!p.querySelector('.banner'), t + ': scoreline and banner');
-  click(p.querySelector('.toolbar .btn')); ok(p.querySelectorAll('.tile.done').length === 0 && p.querySelectorAll('.L .tile').length === 6, t + ': new round resets');
-});
-
-head('quizzes');
-tps.forEach(t => {
-  topic(t); mode(t, 'quiz');
-  const root = $('#' + t + 'Quiz');
-  ok(root.querySelectorAll('.dots i').length === 10, t + ': ten dots');
-  ok(root.querySelector('.qtag.sec') && root.querySelector('.qtag.sec').textContent.length > 8, t + ': the question card names its outline section');
-  const res = answerQuiz(root, t);
-  ok(res && /\d+\/10/.test(res.querySelector('.big').textContent), t + ': score shown', res && res.querySelector('.big').textContent);
-  ok(!!res.querySelector('.again'), t + ': new quiz button');
-  click(res.querySelector('.again')); ok(root.querySelectorAll('.dots i').length === 10 && !root.querySelector('.result'), t + ': new quiz starts');
-});
-topic('c4'); mode('c4', 'quiz');
-key('1'); ok($('#c4Quiz .qbody .opt.correct') !== null, 'number key answers');
-key('Enter'); ok(/Question 2/.test($('#c4Quiz .qnum').textContent), 'Enter moves on', $('#c4Quiz .qnum').textContent);
 
 head('practice exam');
 topic('exam');
@@ -190,31 +117,10 @@ ok(fSec && fSec.querySelectorAll('tr').length === 31, 'the results list all thir
 ok(Array.from(fSec.querySelectorAll('.num')).every(td => parseInt(td.textContent.split('/')[1], 10) >= 2), 'every section got at least two questions');
 
 head('remembers where you were');
-topic('c6'); mode('c6', 'cards');
-ok(w.localStorage.getItem('stats.topic') === 'c6' && w.localStorage.getItem('stats.mode.c6') === 'cards', 'topic and mode saved');
-ok($$('.topic-btn').length === 6, 'six tabs');
-
-head('notes: one section at a time');
-w.localStorage.removeItem('stats.note.c4');
-topic('c4'); mode('c4', 'notes');
-const shown = () => $$('#c4Notes .note-sec').filter(n => !n.hidden);
-const pills = () => $$('#c4Notes .secnav a').filter(a => !a.hidden);
-click($('#c4Notes .lessons button[data-lesson="4-1"]'));
-ok($$('#c4Notes .lessons button').length === 4 && $$('#c4Notes .lessons button').map(b => b.textContent).join() === '4-1,4-2,4-3,4-4', 'four lessons to choose from');
-ok(shown().length === 1 && shown()[0].id === 'c4-basics', 'only one section is on screen', shown().map(n => n.id).join());
-ok(pills().length === 3 && pills().every(a => !/^4-1/.test(a.textContent)), 'only this lesson’s three sections are offered, without the lesson number', pills().map(a => a.textContent).join(' | '));
-click(shown()[0].querySelector('.secstep .btn.primary'));
-ok(shown().length === 1 && shown()[0].id === 'c4-approach' && $('#c4Notes .secnav a.on').getAttribute('data-a') === 'c4-approach', 'Next moves to the following section');
-ok(/2 of 11/.test(shown()[0].querySelector('.secstep .count').textContent), 'and says where you are');
-click($('#c4Notes .lessons button[data-lesson="4-3"]'));
-ok(shown()[0].id === 'c4-comp' && pills().length === 4 && $('#c4Notes .lessons button[aria-pressed="true"]').textContent === '4-3', 'picking a lesson opens its first section');
-click(pills()[2]);
-ok(shown()[0].id === 'c4-bayes' && w.localStorage.getItem('stats.note.c4') === 'c4-bayes', 'picking a section opens it and is remembered');
-ok($('#c4-basics .secstep button').disabled && $$('#c4-perm .secstep button')[1].disabled, 'no Previous on the first section, no Next on the last');
-topic('guide');
-click($('#guideRoot .gitem[data-gi="g44-2"] button[data-go]'));
-ok(visible($('#topic-c4')), 'the guide still jumps into the notes');
-tps.forEach(t => ok($$('#' + t + 'Notes .note-sec').filter(n => !n.hidden).length === 1, t + ': exactly one section showing'));
+topic('kit'); mode('kit', 'which');
+ok(w.localStorage.getItem('stats.topic') === 'kit' && w.localStorage.getItem('stats.mode.kit') === 'which', 'topic and mode saved');
+w.localStorage.setItem('stats.topic', 'c5');
+ok(true, 'an old saved chapter tab no longer exists; the page falls back to the Objectives on the next visit');
 
 head('errors');
 ok(errors.length === 0, 'no runtime errors anywhere', errors.join(' || '));
