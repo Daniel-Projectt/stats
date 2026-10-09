@@ -147,6 +147,8 @@ function questionsByKeys(keys){
 /* The practice exam: every chapter, reshuffled.
    types  — all / mc / tf / ap
                                                                               */
+/* the professor's own practice quiz for one chapter: every one of his questions, reshuffled */
+function realQuiz(n){ var out = []; QB.forEach(function(b, i){ if(b.real === n) out.push(fromBank(b, i)); }); return shuffle(out); }
 function mockQuestions(cfg){
   var tps = cfg.topics && cfg.topics.length ? cfg.topics : CHAPTERS.slice();
   var n = cfg.n || 25;

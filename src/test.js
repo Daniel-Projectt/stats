@@ -145,7 +145,7 @@ console.log('  questions: ' + A.QB.length);
 
 // ---------- 5. option length must not give the answer away ----------
 head('option length is not a tell');
-const mcq = A.QB.filter(q => q.t === 'mc');
+const mcq = A.QB.filter(q => q.t === 'mc' && !q.real);   // his own questions keep his wording and options
 const olen = s => strip(s).length;
 const longestShare = mcq.filter(q => olen(q.a) > Math.max(...q.w.map(olen))).length / mcq.length;
 const lenRatio = mcq.reduce((t, q) => t + olen(q.a) / (q.w.reduce((u, x) => u + olen(x), 0) / q.w.length), 0) / mcq.length;
@@ -210,6 +210,29 @@ ok(/<b>Correct\.<\/b>/.test(src) && /<b>Not this one\.<\/b>/.test(src), 'answer 
 head('markup');
 ok((html.match(/class="topic-btn"/g) || []).length === 4, 'four tabs: objectives, practice, exam prep, exam kit');
 // ---------- exam prep: his 31-question practice exam, every number recomputed ----------
+head('the professor’s practice quiz, chapter 4');
+{
+  const R4 = A.QB.filter(q => q.real === 4), ra = re => R4.find(q => re.test(q.q)).a;
+  ok(R4.length === 18 && R4.every(q => q.tp === 'c4' && q.t === 'mc' && q.w.length === 3 && q.e.length > 30 && /^g4\d-\d$/.test(q.sec)), 'eighteen of his questions, each tied to a chapter 4 objective');
+  ok(ra(/gold tier or the silver tier/).startsWith('The events are mutually exclusive and dependent'), 'Q1');
+  ok(ra(/40% of customers who used a coupon/) === 'Multiply 0.40 by the proportion of all customers who used a coupon.', 'Q2');
+  ok(ra(/defect rate is lower at Plant L/).startsWith('At Plant L'), 'Q3');
+  ok(ra(/five odd results in a row/).startsWith('Its probability of being even remains one-half'), 'Q5');
+  ok(ra(/adds P\(online\) and P\(expedited\)/).startsWith('Subtract P(online and expedited) once'), 'Q6');
+  ok(ra(/two invoices without replacement/) === '(2/6) × (1/5)', 'Q7');
+  ok(Math.abs((1 - 0.60) * (1 - 0.50) - 0.20) < 1e-12 && ra(/receives neither message/).startsWith('0.20'), 'Q8: 0.40 × 0.50 = 0.20');
+  ok(ra(/80 flagged transactions/).startsWith('Use 30/80'), 'Q10');
+  ok(5 * 4 === 20 && 5 * 4 / 2 === 10 && ra(/Five associates/) === '10 unordered groups and 20 role assignments.', 'Q11: 20 role assignments, 10 groups');
+  ok(Math.abs(0.25 * 0.40 / (0.25 * 0.40 + 0.75 * 0.08) - 0.625) < 1e-12 && /= 0\.625\.$/.test(ra(/Twenty-five percent of software accounts/)), 'Q12: 0.625');
+  ok(ra(/Flip a coin twice/) === '{HH, HT, TH, TT}', 'Q13');
+  ok(((100 + 20 - 5) / 200).toFixed(3) === ra(/wood or defective/), 'Q14: 115 of 200');
+  ok((45 / 54 * 44 / 53 * 43 / 52).toFixed(4) === ra(/IRS auditor/) && Math.pow(45 / 54, 3).toFixed(4) === '0.5787', 'Q15: 0.5721 without replacement (0.5787 is the with-replacement trap)');
+  const fa = n => n < 2 ? 1 : n * fa(n - 1);
+  ok(String(fa(10) / (fa(5) * fa(5))) === ra(/board of directors/) && 10 * 9 * 8 * 7 * 6 === 30240, 'Q16: 252 subcommittees');
+  ok((5 / (11 + 5 + 17)).toFixed(3) === ra(/approves of the mayor/) && 11 + 5 + 17 + 18 + 12 + 37 === 100, 'Q17: 5 of 33');
+  ok((0.36 * 0.021 / (0.36 * 0.021 + 0.64 * 0.049)).toFixed(3) === ra(/Maplewood/), 'Q18: 0.194');
+  for (let r = 0; r < 20; r++) { const q = A.realQuiz(4); ok(q.length === 18 && new Set(q.map(x => x.key)).size === 18 && q.every(x => x.opts.length === 4 && x.opts.filter(o => o.ok).length === 1), 'the quiz runs all eighteen, one right answer each'); }
+}
 head('exam prep');
 {
   const P = A.PREP, xs = s => String(s).replace(/<[^>]+>/g, ''), ans = (q, p) => xs(P[q - 1].parts[p][1]);

@@ -116,6 +116,16 @@ const fSec = fRes.querySelectorAll('.tbl')[0];
 ok(fSec && fSec.querySelectorAll('tr').length === 31, 'the results list all thirty-one objectives', fSec && fSec.querySelectorAll('tr').length);
 ok(Array.from(fSec.querySelectorAll('.num')).every(td => parseInt(td.textContent.split('/')[1], 10) >= 2), 'every section got at least two questions');
 
+head('the professor’s practice quiz');
+topic('exam');
+if (!$('#mxReal4') && $('#mockExam .setupbtn')) click($('#mockExam .setupbtn'));
+ok(!!$('#mxReal4'), 'the Practice tab offers his Chapter 4 quiz');
+click($('#mxReal4'));
+ok($$('#mockExam .dots i').length === 18, 'eighteen questions', $$('#mockExam .dots i').length);
+const realRes = answerQuiz($('#mockExam'), 'his quiz');
+ok(realRes && /\/18/.test(realRes.querySelector('.big').textContent), 'scored out of 18');
+click(realRes.querySelector('.setupbtn'));
+
 head('exam prep');
 w.localStorage.removeItem('stats.prep');
 topic('guide'); topic('prep');
