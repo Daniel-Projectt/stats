@@ -140,3 +140,43 @@ var PREP = [
    ["What patterns raise concerns?", "A systematic curve, such as an S shape, or points far off the line."],
    ["Do the graphs prove the data is normal?", "No. Graphs support or question a model; they never prove it."]]}
 ];
+
+/* ================================================================ the two essay questions (Exam 2 essay rubric, pasted 8-oct)
+   The rubric names the criteria and their points, not the questions themselves. "say" is what
+   each criterion asks for in plain words; the practice question is ours, with a full-credit
+   answer. test.js recomputes its numbers.                                                    */
+var ESSAYS = [
+ {q:"Question 17", pts:10, about:"A probability about a machine: calculate it, say what it means, and name the weak spot in the model.",
+  rows:[
+   ["Probability calculation", 4, "Show the calculation and report the probability with consistent units.", "Write the model and its numbers, the formula with the numbers in it, and the answer. If the rate is “per week” and the question is “per shift”, convert it first and say so."],
+   ["Reliability interpretation", 3, "Compare the two probabilities and explain what the comparison means for the machine.", "Put the two numbers side by side, say which is bigger and by about how much, then say what that means for the machine in plain words."],
+   ["Assumption and limitation", 3, "Explain a realistic way the model assumption could fail and why it matters.", "Name the assumption (events independent, rate or chance constant), give one real way it breaks, and say what that does to your answer."]],
+  steps:["Name the model and the numbers: what you are counting, and n and p, or the mean for the time asked about.",
+   "Show the work: the formula or the Excel function with the numbers in it, then the probability.",
+   "Do the same for the second probability, in the same units.",
+   "Compare them in one sentence, and say what it means for the machine.",
+   "Name one assumption, one realistic way it fails, and why the answer would then be off."],
+  prompt:"A packaging machine averages 3 breakdowns per 40-hour week. Find the probability of no breakdowns in one 8-hour shift, and the probability of no breakdowns in a full week. Compare them, and discuss one assumption.",
+  answer:["<b>Model.</b> Breakdowns in a stretch of time: a Poisson count. The rate is 3 per 40 hours.",
+   "<b>One shift.</b> Convert the rate to the shift: 3 × (8 ÷ 40) = 0.6 breakdowns per shift. P(none) = <code>=POISSON.DIST(0,0.6,FALSE)</code> = <b>0.5488</b>.",
+   "<b>One week.</b> The mean is 3 per week. P(none) = <code>=POISSON.DIST(0,3,FALSE)</code> = <b>0.0498</b>.",
+   "<b>Compare.</b> A breakdown-free shift happens about 55% of the time; a breakdown-free week only about 5% of the time, roughly eleven times less likely. The machine is fairly dependable over a single shift, but over a whole week a breakdown is close to certain, so maintenance should be planned every week.",
+   "<b>Assumption.</b> Poisson assumes breakdowns happen independently and at a steady rate. That can fail if the machine wears or heats up as the week goes on, or if one breakdown damages a part and causes another. Then breakdowns cluster and the true chance of a trouble-free week is not 0.0498, so the number would mislead whoever plans the repairs."]},
+ {q:"Question 18", pts:10, about:"The sampling distribution of the sample mean: where it centers, what shape it has and when, and how it differs from the individual values.",
+  rows:[
+   ["Center of sample means", 3, "Identify the center of the sampling distribution and explain its relation to the population.", "The sample means center on the population mean. Say why: the sample mean is an unbiased estimator, so it targets the population mean."],
+   ["Shape and conditions", 4, "Explain the expected shape and the relevant sampling conditions.", "Approximately normal, because the population is normal or the sample is larger than 30 (central limit theorem). Conditions: a random sample and independent observations. Give the spread too: σ ÷ √n."],
+   ["Distribution distinction", 3, "Distinguish the distribution of a statistic from the distribution of individual observations.", "Individual values keep the population’s shape and its spread, σ. The sample means are a different distribution: bell-shaped and narrower, with spread σ ÷ √n. The theorem does not make the individuals normal."]],
+  steps:["Center: the mean of the sample means equals the population mean. Give the number.",
+   "Spread: the standard error, σ ÷ √n. Give the number.",
+   "Shape: approximately normal, and the reason (normal population, or n over 30).",
+   "Conditions: random sample, independent observations.",
+   "The difference: individuals keep the population’s shape and σ; sample means are bell-shaped and narrower."],
+  prompt:"Customer wait times are skewed to the right, with a mean of 12 minutes and a standard deviation of 6 minutes. A manager takes random samples of 36 customers and records each sample’s mean. Describe the sampling distribution of the sample mean, and explain how it differs from the distribution of individual wait times.",
+  answer:["<b>Center.</b> The sample means center on the population mean, <b>12 minutes</b>. The sample mean is an unbiased estimator: across many samples it targets the population mean.",
+   "<b>Spread.</b> The standard error is 6 ÷ √36 = <b>1 minute</b>.",
+   "<b>Shape.</b> Approximately normal. The population is skewed, but the sample size, 36, is larger than 30, so the central limit theorem applies.",
+   "<b>Conditions.</b> The samples must be random and the observations independent, for example by sampling a small share of all customers.",
+   "<b>The difference.</b> Individual wait times stay skewed to the right, with a standard deviation of 6 minutes; one customer can easily wait 20. The means of 36 customers form a different distribution: bell-shaped and much narrower, almost always within about 2 minutes of 12. The theorem is about the means, not about the individual customers."]}
+];
+

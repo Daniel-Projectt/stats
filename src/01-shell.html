@@ -39,7 +39,12 @@
     <!-- ================= EXAM PREP ================= -->
     <section class="topic" id="topic-prep" hidden>
       <p class="intro">A practice exam with one question for every objective, with numbers you haven&rsquo;t seen. Work each part on paper first, then tap to check yourself.</p>
+      <div class="modes"><div class="seg" data-modes="prep">
+        <button type="button" data-mode="run" aria-pressed="true">The 31 questions</button>
+        <button type="button" data-mode="essays" aria-pressed="false">The two essays</button>
+      </div></div>
       <div class="panel" data-panel="prep/run"><div id="prepRoot"></div></div>
+      <div class="panel" data-panel="prep/essays" hidden><div id="essayRoot"></div></div>
     </section>
 
     <!-- ================= PRACTICE EXAM ================= -->

@@ -151,6 +151,16 @@ topic('guide'); topic('prep');
 ok(/Question 1 of 2/.test(pr().textContent), 'it remembers where you were');
 w.localStorage.removeItem('stats.prep');
 
+head('the two essays');
+topic('prep'); mode('prep', 'essays');
+ok(visible($('#essayRoot')) && !visible($('#prepRoot')) && $$('#essayRoot .essay').length === 2, 'Exam Prep has a second page: the two essays');
+ok($$('#essayRoot .rub tbody tr').length === 6 && /Reliability interpretation/.test($('#essayRoot').textContent) && /Distribution distinction/.test($('#essayRoot').textContent), 'six rubric lines with what to write');
+ok($$('#essayRoot .eanswer').every(a => a.hidden), 'the full-credit answers start hidden');
+click($('#essayRoot [data-essay="0"]'));
+ok(!$('#essayAns0').hidden && /0\.5488/.test($('#essayAns0').textContent) && $('#essayAns1').hidden, 'tapping shows that essay’s answer only');
+click($('#essayRoot [data-essay="0"]')); ok($('#essayAns0').hidden, 'and hides it again');
+mode('prep', 'run'); ok(visible($('#prepRoot')), 'back to the 31 questions');
+
 head('remembers where you were');
 topic('kit'); mode('kit', 'which');
 ok(w.localStorage.getItem('stats.topic') === 'kit' && w.localStorage.getItem('stats.mode.kit') === 'which', 'topic and mode saved');

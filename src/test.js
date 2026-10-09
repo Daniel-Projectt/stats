@@ -249,6 +249,16 @@ head('exam prep');
   has(30, 0, r4(1 - Phi(0.5))); has(30, 1, r4(1 - Phi((44 - 40) / (8 / Math.sqrt(16)))));
   ok(P[15].parts[3][2] === 7 && P[21].parts[1][2] === 1 && P[29].parts[1][2] === 3 && P[25].parts[1][2] === 4 && P[26].parts[0][2] === 5 && P[22].parts[2][2] === 6, 'his traps are attached to the parts where he falls in');
   ok(!/flagged/i.test(JSON.stringify(P[7])), 'the Bayes question says “reject pile”, never “flagged”');
+  // the two essays: the rubric as pasted, and the practice numbers recomputed
+  const E = A.ESSAYS, ea = (i, v) => ok(xs(E[i].answer.join(' ')).includes(v), 'essay ' + (i + 17) + ' practice answer shows ' + v, xs(E[i].answer.join(' ')));
+  ok(E.length === 2 && E.map(e => e.q).join() === 'Question 17,Question 18' && E.every(e => e.pts === 10 && e.rows.length === 3 && e.rows.reduce((n, r) => n + r[1], 0) === 10), 'two essays, three rubric lines each, ten points each');
+  ok(E[0].rows.map(r => r[0] + ':' + r[1]).join('|') === 'Probability calculation:4|Reliability interpretation:3|Assumption and limitation:3', 'Question 17 rubric as given');
+  ok(E[1].rows.map(r => r[0] + ':' + r[1]).join('|') === 'Center of sample means:3|Shape and conditions:4|Distribution distinction:3', 'Question 18 rubric as given');
+  ok(/Compare the two probabilities and explain what the comparison means for the machine\./.test(E[0].rows[1][2]) && /Distinguish the distribution of a statistic from the distribution of individual observations\./.test(E[1].rows[2][2]), 'the rubric wording is the professor’s own');
+  ea(0, (3 * 8 / 40).toFixed(1)); ea(0, r4(Math.exp(-0.6))); ea(0, r4(Math.exp(-3)));
+  ok(Math.round(Math.exp(-0.6) / Math.exp(-3)) === 11, 'the shift is about eleven times as likely to be breakdown-free');
+  ea(1, '12 minutes'); ea(1, String(6 / Math.sqrt(36)) + ' minute'); ok(36 > 30, 'n over 30 for the central limit theorem');
+  ok(E.every(e => e.steps.length === 5 && e.answer.length === 5), 'a five-step template and a five-paragraph answer for each');
 }
 ['guide', 'exam', 'prep', 'kit'].forEach(t => ok(html.includes('data-topic="' + t + '"') && html.includes('id="topic-' + t + '"'), 'tab and section: ' + t));
 ok(!/id="topic-c[456]"|id="c[456](Notes|Cards|Match|Quiz)"/.test(html), 'the chapter tabs, notes, flashcards and matching are gone');

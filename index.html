@@ -546,6 +546,22 @@ details.work summary{font-size:12px}
 .preparts code{font-family:Consolas,"Courier New",monospace;font-size:.9em;overflow-wrap:anywhere}
 .phint[hidden]{display:none}
 .prepfoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin-top:18px}
+
+/* ---- the two essays ---- */
+.tbl.rub td{vertical-align:top}
+.tbl.rub td:first-child{width:44%}
+.tbl.rub b{display:block;font-weight:600}
+.tbl.rub .rpts{display:block;font-family:var(--sans);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:2px 0 5px}
+.tbl.rub i{display:block;color:var(--muted);font-size:13.5px;line-height:1.45}
+.esteps{margin:0 0 6px;padding-left:1.3em}
+.esteps li{margin:0 0 7px;line-height:1.55}
+.eprompt{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:14px 16px;font-size:16.5px;line-height:1.55;box-shadow:var(--shadow)}
+.eanswer{margin-top:14px;background:var(--surface-2);border:1px solid var(--line);border-radius:3px;padding:14px 16px}
+.eanswer[hidden]{display:none}
+.eanswer p{margin:0 0 10px;font-size:15.5px;line-height:1.6}
+.eanswer p:last-child{margin-bottom:0}
+.eanswer code{font-family:Consolas,"Courier New",monospace;font-size:.9em;overflow-wrap:anywhere}
+@media print{ .eanswer[hidden]{display:block!important} }
 </style>
 </head>
 <body>
@@ -641,7 +657,12 @@ details.work summary{font-size:12px}
     <!-- ================= EXAM PREP ================= -->
     <section class="topic" id="topic-prep" hidden>
       <p class="intro">A practice exam with one question for every objective, with numbers you haven&rsquo;t seen. Work each part on paper first, then tap to check yourself.</p>
+      <div class="modes"><div class="seg" data-modes="prep">
+        <button type="button" data-mode="run" aria-pressed="true">The 31 questions</button>
+        <button type="button" data-mode="essays" aria-pressed="false">The two essays</button>
+      </div></div>
       <div class="panel" data-panel="prep/run"><div id="prepRoot"></div></div>
+      <div class="panel" data-panel="prep/essays" hidden><div id="essayRoot"></div></div>
     </section>
 
     <!-- ================= PRACTICE EXAM ================= -->
@@ -1722,6 +1743,46 @@ var PREP = [
    ["Do the graphs prove the data is normal?", "No. Graphs support or question a model; they never prove it."]]}
 ];
 
+/* ================================================================ the two essay questions (Exam 2 essay rubric, pasted 8-oct)
+   The rubric names the criteria and their points, not the questions themselves. "say" is what
+   each criterion asks for in plain words; the practice question is ours, with a full-credit
+   answer. test.js recomputes its numbers.                                                    */
+var ESSAYS = [
+ {q:"Question 17", pts:10, about:"A probability about a machine: calculate it, say what it means, and name the weak spot in the model.",
+  rows:[
+   ["Probability calculation", 4, "Show the calculation and report the probability with consistent units.", "Write the model and its numbers, the formula with the numbers in it, and the answer. If the rate is “per week” and the question is “per shift”, convert it first and say so."],
+   ["Reliability interpretation", 3, "Compare the two probabilities and explain what the comparison means for the machine.", "Put the two numbers side by side, say which is bigger and by about how much, then say what that means for the machine in plain words."],
+   ["Assumption and limitation", 3, "Explain a realistic way the model assumption could fail and why it matters.", "Name the assumption (events independent, rate or chance constant), give one real way it breaks, and say what that does to your answer."]],
+  steps:["Name the model and the numbers: what you are counting, and n and p, or the mean for the time asked about.",
+   "Show the work: the formula or the Excel function with the numbers in it, then the probability.",
+   "Do the same for the second probability, in the same units.",
+   "Compare them in one sentence, and say what it means for the machine.",
+   "Name one assumption, one realistic way it fails, and why the answer would then be off."],
+  prompt:"A packaging machine averages 3 breakdowns per 40-hour week. Find the probability of no breakdowns in one 8-hour shift, and the probability of no breakdowns in a full week. Compare them, and discuss one assumption.",
+  answer:["<b>Model.</b> Breakdowns in a stretch of time: a Poisson count. The rate is 3 per 40 hours.",
+   "<b>One shift.</b> Convert the rate to the shift: 3 × (8 ÷ 40) = 0.6 breakdowns per shift. P(none) = <code>=POISSON.DIST(0,0.6,FALSE)</code> = <b>0.5488</b>.",
+   "<b>One week.</b> The mean is 3 per week. P(none) = <code>=POISSON.DIST(0,3,FALSE)</code> = <b>0.0498</b>.",
+   "<b>Compare.</b> A breakdown-free shift happens about 55% of the time; a breakdown-free week only about 5% of the time, roughly eleven times less likely. The machine is fairly dependable over a single shift, but over a whole week a breakdown is close to certain, so maintenance should be planned every week.",
+   "<b>Assumption.</b> Poisson assumes breakdowns happen independently and at a steady rate. That can fail if the machine wears or heats up as the week goes on, or if one breakdown damages a part and causes another. Then breakdowns cluster and the true chance of a trouble-free week is not 0.0498, so the number would mislead whoever plans the repairs."]},
+ {q:"Question 18", pts:10, about:"The sampling distribution of the sample mean: where it centers, what shape it has and when, and how it differs from the individual values.",
+  rows:[
+   ["Center of sample means", 3, "Identify the center of the sampling distribution and explain its relation to the population.", "The sample means center on the population mean. Say why: the sample mean is an unbiased estimator, so it targets the population mean."],
+   ["Shape and conditions", 4, "Explain the expected shape and the relevant sampling conditions.", "Approximately normal, because the population is normal or the sample is larger than 30 (central limit theorem). Conditions: a random sample and independent observations. Give the spread too: σ ÷ √n."],
+   ["Distribution distinction", 3, "Distinguish the distribution of a statistic from the distribution of individual observations.", "Individual values keep the population’s shape and its spread, σ. The sample means are a different distribution: bell-shaped and narrower, with spread σ ÷ √n. The theorem does not make the individuals normal."]],
+  steps:["Center: the mean of the sample means equals the population mean. Give the number.",
+   "Spread: the standard error, σ ÷ √n. Give the number.",
+   "Shape: approximately normal, and the reason (normal population, or n over 30).",
+   "Conditions: random sample, independent observations.",
+   "The difference: individuals keep the population’s shape and σ; sample means are bell-shaped and narrower."],
+  prompt:"Customer wait times are skewed to the right, with a mean of 12 minutes and a standard deviation of 6 minutes. A manager takes random samples of 36 customers and records each sample’s mean. Describe the sampling distribution of the sample mean, and explain how it differs from the distribution of individual wait times.",
+  answer:["<b>Center.</b> The sample means center on the population mean, <b>12 minutes</b>. The sample mean is an unbiased estimator: across many samples it targets the population mean.",
+   "<b>Spread.</b> The standard error is 6 ÷ √36 = <b>1 minute</b>.",
+   "<b>Shape.</b> Approximately normal. The population is skewed, but the sample size, 36, is larger than 30, so the central limit theorem applies.",
+   "<b>Conditions.</b> The samples must be random and the observations independent, for example by sampling a small share of all customers.",
+   "<b>The difference.</b> Individual wait times stay skewed to the right, with a standard deviation of 6 minutes; one customer can easily wait 20. The means of 36 customers form a different distribution: bell-shaped and much narrower, almost always within about 2 minutes of 12. The theorem is about the means, not about the individual customers."]}
+];
+
+
 /* ================================================================ helpers */
 function $(s,r){ return (r||document).querySelector(s); }
 function $$(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
@@ -1949,7 +2010,7 @@ function matchRound(tp, n){
 
 /* ---- the pure parts can be tested outside a browser ---- */
 if(typeof window === "undefined"){
-  module.exports = {CH:CH, COURSE:COURSE, GUIDE:GUIDE, EX:EX, PREP:PREP, PREP_TRAPS:PREP_TRAPS, KEYTERMS:KEYTERMS, KIT:KIT,
+  module.exports = {CH:CH, COURSE:COURSE, GUIDE:GUIDE, EX:EX, PREP:PREP, PREP_TRAPS:PREP_TRAPS, ESSAYS:ESSAYS, KEYTERMS:KEYTERMS, KIT:KIT,
     QB:QB, PAIRSETS:PAIRSETS, VERDICTS:VERDICTS, CHAPTERS:CHAPTERS, TOPIC_NAMES:TOPIC_NAMES, SEC_TITLES:SEC_TITLES, SEC_CHAPTER:SEC_CHAPTER,
     finalFifty:finalFifty, meaningOf:meaningOf, sameThing:sameThing,
     fromBank:fromBank, fromPair:fromPair, topicQuestions:topicQuestions, mockQuestions:mockQuestions, questionsByKeys:questionsByKeys,
@@ -2260,6 +2321,27 @@ function renderPrep(){
   if($("#prepNo")) $("#prepNo").addEventListener("click", function(){ mark(0); });
 }
 
+/* ================================================================ the two essay questions */
+function renderEssays(){
+  $("#essayRoot").innerHTML =
+    '<div class="note-sec"><div class="point"><b>The point</b><p>The exam ends with <mark>two essay questions, 10 points each</mark>. The rubric says exactly what earns the points, so write one short paragraph for each line of it, in order.</p><p class="able"><b>Be able to</b> hit all three lines of each rubric without looking.</p></div></div>'+
+    ESSAYS.map(function(e, i){
+      return '<div class="note-sec essay"><h2>'+e.q+' &middot; '+e.pts+' points</h2>'+divider()+
+        '<p class="lead">'+e.about+'</p>'+
+        '<div class="tblwrap"><table class="tbl n0 rub"><thead><tr><th>The rubric line</th><th>What to write</th></tr></thead><tbody>'+
+        e.rows.map(function(r){ return '<tr><td class="sm"><b>'+r[0]+'</b><span class="rpts">'+r[1]+' points</span><i>'+r[2]+'</i></td><td class="sm">'+r[3]+'</td></tr>'; }).join("")+
+        '</tbody></table></div>'+
+        '<h3 class="sub">A template</h3><ol class="esteps">'+e.steps.map(li).join("")+'</ol>'+
+        '<h3 class="sub">Practice</h3><p class="eprompt">'+e.prompt+'</p>'+
+        '<div class="toolbar" style="justify-content:center"><button class="btn primary" type="button" data-essay="'+i+'">Show a full-credit answer</button></div>'+
+        '<div class="eanswer" id="essayAns'+i+'" hidden>'+e.answer.map(function(x){ return '<p>'+x+'</p>'; }).join("")+'</div></div>';
+    }).join("")+
+    '<p class="note">The rubric gives the criteria, not the questions. The two practice questions here are written to fit it; the real ones will use different numbers and may use a different setting.</p>';
+  $$("#essayRoot [data-essay]").forEach(function(b){
+    b.addEventListener("click", function(){ var a = $("#essayAns"+b.getAttribute("data-essay")); a.hidden = !a.hidden; b.textContent = a.hidden ? "Show a full-credit answer" : "Hide the answer"; });
+  });
+}
+
 /* ================================================================ practice exam */
 var mockCfg = getJSON("mockcfg", {n:25, types:"all", topic:"all"});
 function mockGen(){ return mockQuestions({n:mockCfg.n, types:mockCfg.types, topics:mockCfg.topic === "all" ? [] : [mockCfg.topic]}); }
@@ -2320,7 +2402,7 @@ function renderMockSetup(){
 
 /* ================================================================ wiring */
 var engines = {};
-renderGuide(); renderKit(); renderPrep();
+renderGuide(); renderKit(); renderPrep(); renderEssays();
 
 var ON_SHOW = {"exam/mock":function(){ if(!engines.mock) renderMockSetup(); }};
 var KEYS = {"exam/mock":function(e){ return engines.mock ? engines.mock.keys(e) : false; }};

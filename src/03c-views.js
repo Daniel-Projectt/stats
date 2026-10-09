@@ -115,6 +115,27 @@ function renderPrep(){
   if($("#prepNo")) $("#prepNo").addEventListener("click", function(){ mark(0); });
 }
 
+/* ================================================================ the two essay questions */
+function renderEssays(){
+  $("#essayRoot").innerHTML =
+    '<div class="note-sec"><div class="point"><b>The point</b><p>The exam ends with <mark>two essay questions, 10 points each</mark>. The rubric says exactly what earns the points, so write one short paragraph for each line of it, in order.</p><p class="able"><b>Be able to</b> hit all three lines of each rubric without looking.</p></div></div>'+
+    ESSAYS.map(function(e, i){
+      return '<div class="note-sec essay"><h2>'+e.q+' &middot; '+e.pts+' points</h2>'+divider()+
+        '<p class="lead">'+e.about+'</p>'+
+        '<div class="tblwrap"><table class="tbl n0 rub"><thead><tr><th>The rubric line</th><th>What to write</th></tr></thead><tbody>'+
+        e.rows.map(function(r){ return '<tr><td class="sm"><b>'+r[0]+'</b><span class="rpts">'+r[1]+' points</span><i>'+r[2]+'</i></td><td class="sm">'+r[3]+'</td></tr>'; }).join("")+
+        '</tbody></table></div>'+
+        '<h3 class="sub">A template</h3><ol class="esteps">'+e.steps.map(li).join("")+'</ol>'+
+        '<h3 class="sub">Practice</h3><p class="eprompt">'+e.prompt+'</p>'+
+        '<div class="toolbar" style="justify-content:center"><button class="btn primary" type="button" data-essay="'+i+'">Show a full-credit answer</button></div>'+
+        '<div class="eanswer" id="essayAns'+i+'" hidden>'+e.answer.map(function(x){ return '<p>'+x+'</p>'; }).join("")+'</div></div>';
+    }).join("")+
+    '<p class="note">The rubric gives the criteria, not the questions. The two practice questions here are written to fit it; the real ones will use different numbers and may use a different setting.</p>';
+  $$("#essayRoot [data-essay]").forEach(function(b){
+    b.addEventListener("click", function(){ var a = $("#essayAns"+b.getAttribute("data-essay")); a.hidden = !a.hidden; b.textContent = a.hidden ? "Show a full-credit answer" : "Hide the answer"; });
+  });
+}
+
 /* ================================================================ practice exam */
 var mockCfg = getJSON("mockcfg", {n:25, types:"all", topic:"all"});
 function mockGen(){ return mockQuestions({n:mockCfg.n, types:mockCfg.types, topics:mockCfg.topic === "all" ? [] : [mockCfg.topic]}); }
@@ -175,7 +196,7 @@ function renderMockSetup(){
 
 /* ================================================================ wiring */
 var engines = {};
-renderGuide(); renderKit(); renderPrep();
+renderGuide(); renderKit(); renderPrep(); renderEssays();
 
 var ON_SHOW = {"exam/mock":function(){ if(!engines.mock) renderMockSetup(); }};
 var KEYS = {"exam/mock":function(e){ return engines.mock ? engines.mock.keys(e) : false; }};
