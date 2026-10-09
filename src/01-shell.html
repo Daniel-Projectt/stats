@@ -28,11 +28,13 @@
     <section class="topic" id="topic-kit" hidden>
       <p class="intro">What you may use on the exam: <b>one flashcard</b> and <b>two online tools</b>. Here is a flashcard worth bringing, exactly which buttons to press on each tool, and how to tell which method a question wants.</p>
       <div class="modes"><div class="seg" data-modes="kit">
-        <button type="button" data-mode="card" aria-pressed="true">Your flashcard</button>
+        <button type="button" data-mode="cheat" aria-pressed="true">Cheat sheet</button>
+        <button type="button" data-mode="card" aria-pressed="false">Your flashcard</button>
         <button type="button" data-mode="tools" aria-pressed="false">The two tools</button>
         <button type="button" data-mode="which" aria-pressed="false">Which method?</button>
       </div></div>
-      <div class="panel" data-panel="kit/card"><div id="kitCard"></div></div>
+      <div class="panel" data-panel="kit/cheat"><div id="kitCheat"></div></div>
+      <div class="panel" data-panel="kit/card" hidden><div id="kitCard"></div></div>
       <div class="panel" data-panel="kit/tools" hidden><div id="kitTools"></div></div>
       <div class="panel" data-panel="kit/which" hidden><div id="kitWhich"></div></div>
     </section>

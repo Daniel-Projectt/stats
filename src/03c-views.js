@@ -189,6 +189,21 @@ function startMock(keys){
   engines.mock = makeQuiz($("#mockExam"), mockGen, {showTopic:true, againLabel:"New practice exam", onSetup:renderMockSetup});
   engines.mock.start(keys || null);
 }
+/* ================================================================ the cheat sheet */
+function renderCheat(){
+  $("#kitCheat").innerHTML =
+    '<div class="note-sec cheat"><div class="point"><b>The point</b><p>Every question has a <mark>clue word</mark> that tells you the move. Find it, make the move, then check the choices for the usual mistake.</p></div>'+
+    '<h3 class="sub">How to read any question</h3><ol class="esteps">'+CHEAT_STEPS.map(li).join("")+'</ol>'+
+    CHEAT.map(function(s){
+      return '<h3 class="sub">'+s.h+'</h3><div class="tblwrap"><table class="tbl n0 cheatt"><thead><tr><th>If it says</th><th>Do this</th><th>The trap</th></tr></thead><tbody>'+
+        s.rows.map(function(r){ return '<tr><td class="sm cq">'+r[0]+'</td><td class="sm">'+r[1]+'</td><td class="sm ctrap">'+(r[2] || "")+'</td></tr>'; }).join("")+'</tbody></table></div>';
+    }).join("")+
+    '<h3 class="sub">One more tell</h3><p>'+CHEAT_TELL+'</p>'+
+    '<h3 class="sub">The two essays</h3><ul class="esteps">'+CHEAT_ESSAY.map(li).join("")+'</ul>'+
+    '<div class="toolbar" style="justify-content:center;margin-top:18px"><button class="btn" type="button" id="cheatPrint">Print the cheat sheet</button></div></div>';
+  $("#cheatPrint").addEventListener("click", function(){ document.body.classList.add("printcheat"); window.print(); setTimeout(function(){ document.body.classList.remove("printcheat"); }, 800); });
+}
+
 /* ================================================================ exam kit */
 function renderKit(){
   function side(title, rows){
@@ -278,12 +293,12 @@ function renderMockSetup(){
 
 /* ================================================================ wiring */
 var engines = {};
-renderGuide(); renderKit(); renderPrep(); renderEssays(); renderFix();
+renderGuide(); renderKit(); renderCheat(); renderPrep(); renderEssays(); renderFix();
 
 var ON_SHOW = {"exam/mock":function(){ if(!engines.mock) renderMockSetup(); }};
 var KEYS = {"exam/mock":function(e){ return engines.mock ? engines.mock.keys(e) : false; }, "fix/run":fixKeys};
 var TOPICS = ["guide","exam","fix","prep","kit"];
-var currentTopic = "guide", currentMode = {guide:"overview", kit:"card", exam:"mock", prep:"run", fix:"run"};
+var currentTopic = "guide", currentMode = {guide:"overview", kit:"cheat", exam:"mock", prep:"run", fix:"run"};
 function showMode(topic, mode){
   currentMode[topic] = mode;
   $$('.seg[data-modes="'+topic+'"] button').forEach(function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-mode") === mode)); });

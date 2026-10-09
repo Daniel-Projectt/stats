@@ -336,6 +336,25 @@ head('all of the professor’s questions together');
   for (let r = 0; r < 10; r++) { const q = A.realQuiz(0); ok(q.length === 48 && new Set(q.map(x => x.key)).size === 48 && new Set(q.map(x => x.tp)).size === 3, 'the all-48 run has every one, from all three chapters'); }
   ok(/id="mxRealAll"/.test(src) && src.indexOf('id="mxRealAll"') < src.indexOf('id="mxReal4"') && src.indexOf('id="mxReal4"') < src.indexOf('id="mxFifty"'), 'in Practice his questions come first, the all-48 button at the very top');
 }
+head('the cheat sheet');
+{
+  const C = A.CHEAT, rows = C.flatMap(s => s.rows), xs = s => String(s).replace(/<[^>]+>/g, '');
+  ok(C.length === 3 && C.map(s => s.rows.length).join() === '14,13,13' && rows.every(r => r[0] && r[1].length > 8), 'three chapters, forty clue lines, each with a move');
+  ok(A.CHEAT_STEPS.length === 4 && A.CHEAT_ESSAY.length === 2 && /Question 17/.test(A.CHEAT_ESSAY[0]) && /Question 18/.test(A.CHEAT_ESSAY[1]), 'four reading steps and both essays');
+  const says = (re, doRe) => ok(rows.some(r => re.test(xs(r[0])) && doRe.test(xs(r[1]))), 'cheat sheet: ' + re + ' → ' + doRe);
+  says(/“or”/, /subtract the overlap once/); says(/neither/, /multiply the misses/); says(/at least one/, /1 − P\(none\)/); says(/given/, /that group only/);
+  says(/committee/, /COMBIN/); says(/Roles/, /PERMUT/); says(/“at least k”/, /1 − TRUE at k − 1/); says(/“fewer than k”/, /k − 1/); says(/“more than k”/, /1 − TRUE at k/);
+  says(/per hour/, /Convert the rate/); says(/k times longer/, /√k/); says(/“between a and b”/, /minus/); says(/top X%/, /NORM\.INV\(1 − X/); says(/mean of n/, /√n/); says(/Four times/, /half/); says(/Biased or unbiased/, /mean, proportion, variance/);
+  // each of these moves is the right answer to one of his real questions
+  const real = A.QB.filter(q => q.real), right = re => real.some(q => re.test(String(q.a)));
+  ok(right(/Subtract P\(online and expedited\) once/) && right(/^1 − F\(2\)$/) && right(/^0\.92$/) && right(/It is halved because standard error is σ\/√n/) && right(/NORM\.DIST\(24,20,4,TRUE\) − NORM\.DIST\(16,20,4,TRUE\)/) && right(/standard deviation is multiplied by the square root of two/), 'the moves match his answer key');
+  // the tell: absolute words mark wrong choices far more often than right ones
+  const ABS = /\b(always|never|automatically|guarantees?|proves?|proved|must)\b/i, mc = real.filter(q => q.t === 'mc');
+  const wrongAbs = mc.reduce((n, q) => n + q.w.filter(w => ABS.test(w)).length, 0), rightAbs = mc.filter(q => ABS.test(q.a)).length;
+  console.log('  absolute words: ' + wrongAbs + ' wrong choices, ' + rightAbs + ' right answers');
+  ok(wrongAbs >= 20 && rightAbs <= 2 && /always, never, must, guarantees, proves, automatically/.test(A.CHEAT_TELL), 'the “always / never” tell holds on his 48 questions', wrongAbs + ' vs ' + rightAbs);
+  ok(/id="kitCheat"/.test(html) && /kit:"cheat"/.test(src), 'the Exam Kit opens on the cheat sheet');
+}
 head('exam prep');
 {
   const P = A.PREP, xs = s => String(s).replace(/<[^>]+>/g, ''), ans = (q, p) => xs(P[q - 1].parts[p][1]);

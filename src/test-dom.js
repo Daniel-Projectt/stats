@@ -81,10 +81,14 @@ ok(visible(panel('exam/mock')) && !!$('#mxStart'), 'the practice button opens th
 
 head('every tab');
 ['guide', 'exam', 'fix', 'prep', 'kit'].forEach(t => { topic(t); ok(visible($('#topic-' + t)) && $$('.topic').filter(visible).length === 1, 'tab opens alone: ' + t); });
-['card', 'tools', 'which'].forEach(m => { mode('kit', m); ok(visible(panel('kit/' + m)) && $$('#topic-kit .panel').filter(visible).length === 1 && panel('kit/' + m).textContent.trim().length > 20, 'exam kit mode: ' + m); });
+['cheat', 'card', 'tools', 'which'].forEach(m => { mode('kit', m); ok(visible(panel('kit/' + m)) && $$('#topic-kit .panel').filter(visible).length === 1 && panel('kit/' + m).textContent.trim().length > 20, 'exam kit mode: ' + m); });
 ok(errors.length === 0, 'no errors after visiting every tab', errors.join(' || '));
 
 head('exam kit');
+mode('kit', 'cheat');
+ok(visible($('#kitCheat')) && $$('#kitCheat .cheatt').length === 3 && $$('#kitCheat .cheatt tbody tr').length === 40 && $$('#kitCheat ol.esteps li').length === 4, 'cheat sheet: three tables, forty clue lines, four reading steps');
+ok(/COMBIN/.test($('#kitCheat').textContent) && /Question 17/.test($('#kitCheat').textContent) && /always, never, must/.test($('#kitCheat').textContent), 'it covers the counting clues, the essays and the tell');
+const pb = w.__printed || 0; click($('#cheatPrint')); ok((w.__printed || 0) === pb + 1 && d.body.classList.contains('printcheat'), 'the cheat sheet prints on its own');
 topic('kit'); mode('kit', 'card');
 ok(visible($('#kitCard')) && $$('#kitCard .fcard').length === 2 && $$('#kitCard .fct tr').length >= 16, 'exam kit: the two-sided flashcard', [visible($('#kitCard')), $$('#kitCard .fcard').length, $$('#kitCard .fct tr').length, $('#topic-kit').hidden, panel('kit/card').hidden].join());
 click($('#kitPrint')); ok(w.__printed >= 1 && d.body.classList.contains('printkit'), 'the flashcard prints on its own');

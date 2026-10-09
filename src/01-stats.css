@@ -300,3 +300,17 @@ details.work summary{font-size:12px}
 .fixq .qtext{font-size:17.5px;line-height:1.5;text-align:left;margin:0 0 14px}
 .fixq .feedback{text-align:left}
 .realcall .btn + .btn{margin-left:8px}
+
+/* ---- the cheat sheet ---- */
+.tbl.cheatt td{vertical-align:top;padding:9px 10px}
+.tbl.cheatt .cq{width:30%;font-weight:600}
+.tbl.cheatt .ctrap{width:26%;color:var(--muted);font-style:italic}
+.tbl.cheatt code{font-family:Consolas,"Courier New",monospace;font-size:.88em;overflow-wrap:anywhere}
+@media (max-width:560px){ .tbl.cheatt td{font-size:13.5px;padding:8px 7px} }
+@media print{
+  body.printcheat header,body.printcheat .topics,body.printcheat .modes,body.printcheat .intro,body.printcheat footer,body.printcheat .rail,body.printcheat #cheatPrint{display:none!important}
+  body.printcheat .topic:not(#topic-kit),body.printcheat #topic-kit .panel:not([data-panel="kit/cheat"]){display:none!important}
+  body.printcheat #topic-kit,body.printcheat [data-panel="kit/cheat"]{display:block!important}
+  body.printcheat .tbl.cheatt td{font-size:10.5px;padding:3px 5px;line-height:1.3}
+  body.printcheat .cheat .point,body.printcheat .cheat h3{margin:6px 0 3px}
+}
