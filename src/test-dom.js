@@ -133,6 +133,9 @@ const r5Res = answerQuiz($('#mockExam'), 'his chapter 5 quiz'); click(r5Res.quer
 click($('#mxReal5m')); ok($$('#mockExam .dots i').length === 6, 'Only the 6 I missed runs six questions');
 const m5Res = answerQuiz($('#mockExam'), 'his chapter 5 misses'); click(m5Res.querySelector('.setupbtn'));
 
+click($('#mxReal6')); ok($$('#mockExam .dots i').length === 16, 'his Chapter 6 quiz: sixteen questions', $$('#mockExam .dots i').length);
+const r6Res = answerQuiz($('#mockExam'), 'his chapter 6 quiz'); click(r6Res.querySelector('.setupbtn'));
+
 head('exam prep');
 w.localStorage.removeItem('stats.prep');
 topic('guide'); topic('prep');

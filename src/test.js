@@ -265,6 +265,30 @@ head('the professor’s practice quiz, chapter 5');
   for (let r = 0; r < 10; r++) ok(A.realQuiz(5, true).length === 6, 'the misses-only run is those six');
   for (let r = 0; r < 10; r++) { const q = A.realQuiz(5); ok(q.length === 14 && q.every(x => x.opts.filter(o => o.ok).length === 1), 'the chapter 5 quiz runs all fourteen'); }
 }
+head('the professor’s practice quiz, chapter 6');
+{
+  const R6 = A.QB.filter(q => q.real === 6), ra = re => R6.find(q => re.test(q.q)).a;
+  const er = x => { const s = x < 0 ? -1 : 1; x = Math.abs(x); const tt = 1 / (1 + 0.3275911 * x); return s * (1 - (((((1.061405429 * tt - 1.453152027) * tt) + 1.421413741) * tt - 0.284496736) * tt + 0.254829592) * tt * Math.exp(-x * x)); };
+  const Ph = z => 0.5 * (1 + er(z / Math.SQRT2));
+  ok(R6.length === 16 && R6.every(q => q.tp === 'c6' && q.e.length > 30 && /^g6\d-\d$/.test(q.sec) && !q.miss) && R6.filter(q => q.t === 'mc').length === 15 && R6.filter(q => q.t === 'mc').every(q => q.w.length === 3 && !q.w.includes(q.a)), 'sixteen of his questions, each tied to a chapter 6 objective, none marked as a miss');
+  ok(ra(/height at 10 minutes/).startsWith('Height is density'), 'Q1');
+  ok(ra(/largest 8% of individual observations/) === '0.92' && Math.abs(1 - 0.08 - 0.92) < 1e-12, 'Q2: 0.92');
+  ok(ra(/four times as many observations/).startsWith('It is halved') && Math.sqrt(4) === 2, 'Q3');
+  ok(ra(/strongly right-skewed/).startsWith('The distribution of the sample means becomes approximately normal'), 'Q4');
+  ok(ra(/consistently overshoot/).startsWith('The first has systematic bias'), 'Q5');
+  ok(ra(/clear curved pattern/).startsWith('The plotted observations depart from a normal pattern'), 'Q6');
+  ok(ra(/between 16 and 24 minutes/) === 'NORM.DIST(24,20,4,TRUE) − NORM.DIST(16,20,4,TRUE)' && (Ph(1) - Ph(-1)).toFixed(4) === '0.6827', 'Q7: the difference of two left areas, 0.6827');
+  ok(12 / Math.sqrt(36) === 2 && ra(/36 independent delivery times/) === '1 − NORM.DIST(33,30,2,TRUE)' && (1 - Ph(1.5)).toFixed(4) === '0.0668', 'Q8: standard error 2, about 0.0668');
+  ok(ra(/daily invoice is \$80/).startsWith('$80'), 'Q9');
+  ok(ra(/greater than 65 minutes/).startsWith('1 − NORM.DIST(65,50,10,TRUE)') && (65 - 50) / 10 === 1.5, 'Q10');
+  ok(ra(/most consistent with an approximately normal/).startsWith('An approximately symmetric'), 'Q11');
+  ok(R6.find(q => /sample proportion/.test(q.q)).a === true && R6.find(q => /sample proportion/.test(q.q)).t === 'tf', 'Q12: the sample proportion is unbiased');
+  ok(/straight-line pattern\.$/.test(ra(/40 randomly selected women/)), 'Q13');
+  ok((Ph(1.5) - 0.5).toFixed(4) === ra(/between 200 and 275/) && (275 - 200) / 50 === 1.5, 'Q14: 0.4332');
+  ok(Math.abs(Ph(0.9154) - 0.82) < 2e-4 && (8.8 + 2 * 0.9154).toFixed(1) + ' years' === ra(/washing machines/), 'Q15: 10.6 years');
+  ok(14 / Math.sqrt(49) === 2 && Math.abs((109.8 - 107) / 2 - 1.4) < 1e-9 && (1 - Ph(1.4)).toFixed(4) === ra(/snowfall/), 'Q16: 0.0808');
+  for (let r = 0; r < 10; r++) { const q = A.realQuiz(6); ok(q.length === 16 && q.every(x => x.opts.filter(o => o.ok).length === 1), 'the chapter 6 quiz runs all sixteen'); }
+}
 head('exam prep');
 {
   const P = A.PREP, xs = s => String(s).replace(/<[^>]+>/g, ''), ans = (q, p) => xs(P[q - 1].parts[p][1]);
