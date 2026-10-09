@@ -90,7 +90,7 @@ ok(visible($('#kitCheat')) && $$('#kitCheat .cheatt').length === 3 && $$('#kitCh
 ok(/COMBIN/.test($('#kitCheat').textContent) && /Question 17/.test($('#kitCheat').textContent) && /always, never, must/.test($('#kitCheat').textContent), 'it covers the counting clues, the essays and the tell');
 const pb = w.__printed || 0; click($('#cheatPrint')); ok((w.__printed || 0) === pb + 1 && d.body.classList.contains('printcheat'), 'the cheat sheet prints on its own');
 topic('kit'); mode('kit', 'card');
-ok(visible($('#kitCard')) && $$('#kitCard .fcard').length === 2 && $$('#kitCard .fct tr').length >= 16, 'exam kit: the two-sided flashcard', [visible($('#kitCard')), $$('#kitCard .fcard').length, $$('#kitCard .fct tr').length, $('#topic-kit').hidden, panel('kit/card').hidden].join());
+ok(visible($('#kitCard')) && $$('#kitCard .fcard').length === 2 && $$('#kitCard .fct tr').length === 46 && $$('#kitCard .fct tr.fch').length === 7 && /Binomial/.test($$('#kitCard .fch')[2].textContent) && !/[μσ]/.test($('#kitCard .fcwrap').textContent), 'exam kit: the two-sided flashcard', [visible($('#kitCard')), $$('#kitCard .fcard').length, $$('#kitCard .fct tr').length, $('#topic-kit').hidden, panel('kit/card').hidden].join());
 click($('#kitPrint')); ok(w.__printed >= 1 && d.body.classList.contains('printkit'), 'the flashcard prints on its own');
 mode('kit', 'tools');
 ok($$('#kitTools .note-sec').length === 2 && $$('#kitTools details.work').length >= 10 && $$('#kitTools a.toollink').every(a => /tools\.benhartlage\.com/.test(a.href)), 'exam kit: both tools with their steps and links');

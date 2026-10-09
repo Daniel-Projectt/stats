@@ -208,11 +208,11 @@ function renderCheat(){
 function renderKit(){
   function side(title, rows){
     return '<div class="fcard card-corners">'+CORNERS+'<div class="fcside">'+title+'</div><table class="fct"><tbody>'+
-      rows.map(function(r){ return '<tr><td class="fck">'+r[0]+'</td><td class="fcv">'+r[1].replace(/\s{2,}/g, "<br>")+'</td></tr>'; }).join("")+'</tbody></table></div>';
+      rows.map(function(r){ return r.length === 1 ? '<tr class="fch"><td colspan="2">'+r[0]+'</td></tr>' : '<tr><td class="fck">'+r[0]+'</td><td class="fcv">'+r[1].replace(/\s{2,}/g, "<br>")+'</td></tr>'; }).join("")+'</tbody></table></div>';
   }
   $("#kitCard").innerHTML =
-    '<div class="note-sec"><div class="point"><b>The point</b><p>You may bring <mark>one flashcard</mark>. Spend it on what is easy to forget under pressure: the formulas, the Excel functions and the phrases that change an endpoint. Copy it by hand; writing it is half the studying.</p><p class="able"><b>Before the exam</b>cover it and see how much you can already write from memory. What you can, leave off and use the space for what you cannot.</p></div></div>'+
-    '<div class="fcwrap">'+side("Front · Chapters 4 and 5", KIT.card.front)+side("Back · Chapter 6 and the essays", KIT.card.back)+'</div>'+
+    '<div class="note-sec"><div class="point"><b>The point</b><p>You may bring <mark>one flashcard</mark>. First decide which kind of problem it is (the headings), then find the question, then copy the formula. Copy it by hand; writing it is half the studying.</p><p class="able"><b>Before the exam</b>cover it and see how much you can already write from memory. What you can, leave off and use the space for what you cannot.</p></div></div>'+
+    '<div class="fcwrap">'+side("Front · probability, binomial, Poisson", KIT.card.front)+side("Back · normal, sample means, essays", KIT.card.back)+'</div>'+
     '<div class="toolbar" style="justify-content:center;margin-top:18px"><button class="btn" type="button" id="kitPrint">Print this card</button></div>';
   $("#kitPrint").addEventListener("click", function(){ document.body.classList.add("printkit"); window.print(); setTimeout(function(){ document.body.classList.remove("printkit"); }, 800); });
   $("#kitTools").innerHTML = KIT.tools.map(function(t){

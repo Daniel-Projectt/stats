@@ -317,3 +317,9 @@ details.work summary{font-size:12px}
 
 .fifty .lastrun{font-family:var(--sans);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:8px}
 .fifty .btn + .lastrun{display:block}
+
+/* ---- the help card: a heading for each kind of problem ---- */
+.fct .fch td{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:rgba(160,120,40,.10);padding:7px 8px;border-top:1px solid var(--line-strong)}
+.fct .fck{white-space:normal;width:30%;letter-spacing:.06em;font-size:10.5px}
+.fct .fcv{overflow-wrap:anywhere}
+@media print{ body.printkit .fct .fch td{font-size:8px;padding:3px 4px} body.printkit .fct .fck{font-size:7.5px} }

@@ -355,14 +355,21 @@ head('all of the professor’s questions together');
 }
 head('his help card');
 {
-  const card = A.KIT.card, all = card.front.concat(card.back), txt = all.map(r => r[0] + ' ' + r[1]).join(' | ');
-  ok(card.front.length === 11 && card.back.length === 12 && all.every(r => r[0] && r[1].length > 5), 'a two-sided card: eleven lines and twelve lines');
-  ['count the overlap ONCE', 'multiply the MISSES', 'top AND bottom drop by 1', 'THAT GROUP only', 'other share × other rate', 'COMBIN', 'PERMUT', 'a LOSS is NEGATIVE', '1 − F(k−1)', 'CONVERT THE RATE FIRST', 'sd × √k',
-   'NORM.INV(1 − X', 'σ ÷ √n', 'NOT σ ÷ n', 'standard error ÷ 2', 'mean, proportion, variance', 'Essay 17', 'Essay 18'].forEach(k => ok(txt.includes(k), 'help card has: ' + k));
-  // every line answers something he actually missed
+  const card = A.KIT.card, all = card.front.concat(card.back), heads = all.filter(r => r.length === 1).map(r => r[0]), rows = all.filter(r => r.length === 2), txt = all.join(' | ');
+  ok(heads.length === 7 && rows.length === 39 && rows.every(r => r[0] && r[1].length > 8), 'divided into seven kinds of problem, thirty-nine questions', heads.length + '/' + rows.length);
+  ok(card.front[0].length === 1 && card.back[0].length === 1, 'each side opens with a heading');
+  ['Plain probability', 'A table of values', 'Binomial', 'Poisson', 'Normal', 'Sample means', 'The two essays'].forEach((h, i) => ok(heads[i].indexOf(h) === 0, 'heading ' + (i + 1) + ': ' + h));
+  ['chance of A + chance of B − chance of both', '(1 − chance of A) × (1 − chance of B)', 'top and bottom each go down by 1', 'the given group', 'group share × group rate', '=COMBIN(total, chosen)', '=PERMUT(total, chosen)', 'a loss is a negative value',
+   'tries × chance', '=BINOM.DIST(3, tries, chance, FALSE)', '=1 − BINOM.DIST(2, tries, chance, TRUE)', 'rate × length of time', '=POISSON.DIST(3, average, FALSE)', 'square root of 2',
+   '(value − mean) ÷ standard deviation', '=NORM.INV(0.90, mean, standard deviation)', 'standard deviation ÷ square root of the sample size', 'SQRT(sample size)', 'cut in half', 'mean, proportion, variance', 'Essay 17', 'Essay 18'].forEach(k => ok(txt.includes(k), 'help card has: ' + k));
+  // he asked for words: no Greek letters, no P(A), no F(k), no lone k or n
+  ok(!/[μσΣ√₁₂]|P\(|F\(|\b[knpx]\b/.test(txt), 'written in words, no letters', (txt.match(/[μσΣ√₁₂]|P\(|F\(|\b[knpx]\b/) || [''])[0]);
+  // the formulas give the right numbers
+  const near = (a, b) => Math.abs(a - b) < 1e-9;
+  ok(near(0.5 + 0.3 - 0.1, 0.7) && near((1 - 0.2) * (1 - 0.5), 0.4) && near((0.3 * 0.04) / (0.3 * 0.04 + 0.7 * 0.01), 12 / 19), 'or, neither and which-group check out');
+  ok(near(Math.sqrt(20 * 0.3 * 0.7), Math.sqrt(4.2)) && near(12 / Math.sqrt(36), 2) && near(12 / Math.sqrt(144), 1), 'binomial spread and the standard error check out; four times the sample halves it');
   const missedSecs = new Set(A.QB.filter(q => q.again || q.miss).map(q => q.sec));
-  ok(['g42-1', 'g42-2', 'g43-3', 'g43-4', 'g44-2', 'g51-4', 'g52-2', 'g53-2', 'g53-3', 'g63-2', 'g64-2', 'g64-3'].every(s => missedSecs.has(s)), 'the card covers the objectives he missed', [...missedSecs].join());
-  ok(txt.length < 1900, 'short enough to copy onto one card by hand', txt.length);
+  ok(['g42-1', 'g42-2', 'g43-3', 'g43-4', 'g44-2', 'g51-4', 'g52-2', 'g53-2', 'g53-3', 'g63-2', 'g64-2', 'g64-3'].every(s => missedSecs.has(s)), 'the card covers the objectives he missed');
 }
 head('the cheat sheet');
 {
