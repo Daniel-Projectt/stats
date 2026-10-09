@@ -289,6 +289,14 @@ head('the professor’s practice quiz, chapter 6');
   ok(14 / Math.sqrt(49) === 2 && Math.abs((109.8 - 107) / 2 - 1.4) < 1e-9 && (1 - Ph(1.4)).toFixed(4) === ra(/snowfall/), 'Q16: 0.0808');
   for (let r = 0; r < 10; r++) { const q = A.realQuiz(6); ok(q.length === 16 && q.every(x => x.opts.filter(o => o.ok).length === 1), 'the chapter 6 quiz runs all sixteen'); }
 }
+head('all of the professor’s questions together');
+{
+  const all = A.QB.filter(q => q.real);
+  ok(all.length === 48 && all.filter(q => q.real === 4).length === 18 && all.filter(q => q.real === 5).length === 14 && all.filter(q => q.real === 6).length === 16, 'forty-eight real questions: 18 + 14 + 16');
+  ok(new Set(all.map(q => q.q)).size === 48, 'no real question appears twice');
+  for (let r = 0; r < 10; r++) { const q = A.realQuiz(0); ok(q.length === 48 && new Set(q.map(x => x.key)).size === 48 && new Set(q.map(x => x.tp)).size === 3, 'the all-48 run has every one, from all three chapters'); }
+  ok(/id="mxRealAll"/.test(src) && src.indexOf('id="mxRealAll"') < src.indexOf('id="mxReal4"') && src.indexOf('id="mxReal4"') < src.indexOf('id="mxFifty"'), 'in Practice his questions come first, the all-48 button at the very top');
+}
 head('exam prep');
 {
   const P = A.PREP, xs = s => String(s).replace(/<[^>]+>/g, ''), ans = (q, p) => xs(P[q - 1].parts[p][1]);

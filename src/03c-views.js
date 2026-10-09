@@ -16,7 +16,8 @@ function li(x){ return "<li>"+x+"</li>"; }
 function renderGuide(){
   var done = getJSON("guide", {}), total = 0;
   GUIDE.sections.forEach(function(s){ total += s.items.length; });
-  var html = '<div class="gprog"><span class="count" id="gCount"></span><div class="bar"><i id="gBar" style="width:0"></i></div></div>';
+  var html = '<div class="realcall"><div><b>The exam questions are in his practice quizzes</b><span>The professor said the exact questions are all there: 48 questions across Chapters 4, 5 and 6.</span></div><button class="btn primary" type="button" id="gReal">Practice the 48</button></div>'+
+    '<div class="gprog"><span class="count" id="gCount"></span><div class="bar"><i id="gBar" style="width:0"></i></div></div>';
   GUIDE.sections.forEach(function(s){
     html += '<div class="gsec"><h2>'+s.h+'</h2>'+divider();
     s.items.forEach(function(it){
@@ -59,6 +60,7 @@ function renderGuide(){
     b.addEventListener("click", function(){ goTo(b.getAttribute("data-go")); });
   });
   $("#gPrint").addEventListener("click", function(){ window.print(); });
+  $("#gReal").addEventListener("click", function(){ goTo("exam/mock"); startRealAll(); });
   progress();
 }
 function goTo(path){
@@ -165,6 +167,11 @@ function renderKit(){
     KIT.which.map(function(w){ return '<tr><td class="sm">'+w[0]+'</td><td class="head">'+w[1]+'</td><td class="sm">'+w[2]+'</td></tr>'; }).join("")+'</tbody></table></div></div>';
 }
 
+/* all three of the professor's practice quizzes in one run */
+function startRealAll(){
+  engines.mock = makeQuiz($("#mockExam"), function(){ return realQuiz(0); }, {showTopic:true, againLabel:"Again, reshuffled", onSetup:renderMockSetup});
+  engines.mock.start(null);
+}
 /* the one-button exam: 50 questions, all sixteen study-guide sections covered */
 function startFifty(){
   engines.mock = makeQuiz($("#mockExam"), function(){ return finalFifty(62); }, {showTopic:true, againLabel:"Another sixty-two", onSetup:renderMockSetup});
@@ -177,6 +184,8 @@ function renderMockSetup(){
   }
   root.innerHTML = '<div class="quizWrap"><div class="qcard card-corners">'+CORNERS+
     '<div class="qnum">Practice exam</div><p class="qtext">Set it up, then answer across the chapters. Each run is drawn fresh.</p>'+
+    '<div class="fifty realall"><button class="btn primary" type="button" id="mxRealAll">All 48 of the professor&rsquo;s questions</button>'+
+      '<p><b>Start here.</b> He said the exact exam questions are all in his practice quizzes. These are those three quizzes together, word for word, with his explanations, in a new order each time.</p></div>'+
     '<div class="fifty"><button class="btn primary" type="button" id="mxReal4">The professor&rsquo;s practice quiz &mdash; Chapter 4</button>'+
       '<p>His own 18 questions from Canvas, word for word, with his explanations, in a new order each time. You scored 11 of 18 the first time.</p>'+
       '<button class="btn" type="button" id="mxReal4m">Only the 7 I missed</button></div>'+
@@ -199,6 +208,7 @@ function renderMockSetup(){
   segWire("#mxP","data-p",function(v){ mockCfg.topic = v; store.set("mockcfg", JSON.stringify(mockCfg)); });
   $("#mxStart").addEventListener("click", function(){ startMock(null); });
   $("#mxFifty").addEventListener("click", startFifty);
+  $("#mxRealAll").addEventListener("click", startRealAll);
   $("#mxReal6").addEventListener("click", function(){
     engines.mock = makeQuiz($("#mockExam"), function(){ return realQuiz(6); }, {showTopic:true, againLabel:"Again, reshuffled", onSetup:renderMockSetup});
     engines.mock.start(null);

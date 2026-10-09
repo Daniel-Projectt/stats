@@ -52,6 +52,12 @@ ok(items.length === 31, 'all thirty-one objectives', items.length);
 ok(/0 of 31/.test($('#gCount').textContent), 'progress starts at 0 of 31', $('#gCount').textContent);
 ok($$('#guideRoot .gsec h2').length === 3, 'three chapters');
 ok(!$('#guideRoot .handout') && !$('#guideRoot .keyterms') && !$('#guideRoot .gsub'), 'no header card, no extra lists, no jump buttons');
+ok(!!$('#guideRoot .realcall') && /exact questions/.test($('#guideRoot .realcall').textContent), 'the Objectives page points to his practice questions first');
+click($('#gReal'));
+ok(visible($('#topic-exam')) && $$('#mockExam .dots i').length === 48, 'Practice the 48 opens a run of all forty-eight', $$('#mockExam .dots i').length);
+const allRes = answerQuiz($('#mockExam'), 'all 48'); ok(allRes && /\/48/.test(allRes.querySelector('.big').textContent), 'scored out of 48');
+click(allRes.querySelector('.setupbtn'));
+topic('guide');
 ok($$('#guideRoot .gans').every(a => a.hidden), 'every answer starts closed');
 
 head('one objective at a time');
