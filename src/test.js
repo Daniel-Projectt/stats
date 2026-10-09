@@ -231,6 +231,12 @@ head('the professor’s practice quiz, chapter 4');
   ok(String(fa(10) / (fa(5) * fa(5))) === ra(/board of directors/) && 10 * 9 * 8 * 7 * 6 === 30240, 'Q16: 252 subcommittees');
   ok((5 / (11 + 5 + 17)).toFixed(3) === ra(/approves of the mayor/) && 11 + 5 + 17 + 18 + 12 + 37 === 100, 'Q17: 5 of 33');
   ok((0.36 * 0.021 / (0.36 * 0.021 + 0.64 * 0.049)).toFixed(3) === ra(/Maplewood/), 'Q18: 0.194');
+  const missed = R4.filter(q => q.miss);
+  ok(missed.length === 7 && missed.every(q => /^You missed this on the practice quiz\. /.test(q.e)) && R4.filter(q => !q.miss).every(q => !/You missed/.test(q.e)), 'his seven misses are marked and say so');
+  ok(['Plant L', 'receives neither message', 'Twenty-five percent', 'wood or defective', 'IRS auditor', 'board of directors', 'Maplewood'].every(k => missed.some(q => q.q.includes(k))), 'the seven are questions 3, 8, 12, 14, 15, 16 and 18');
+  ok(/Complementary events must also exhaust every possible outcome/.test(R4[0].e) && /100\/160 = 0\.625/.test(R4.find(q => /Twenty-five percent/.test(q.q)).e), 'the explanations are the professor’s own feedback');
+  ok(Math.round(3600 * 0.021) === 76 && Math.round(6400 * 0.049) === 314 && (76 / 390).toFixed(2) === '0.19', 'the 10,000-player picture added to Q18 is right');
+  for (let r = 0; r < 10; r++) { const q = A.realQuiz(4, true); ok(q.length === 7 && q.every(x => /You missed/.test(x.explain)), 'the misses-only run is those seven'); }
   for (let r = 0; r < 20; r++) { const q = A.realQuiz(4); ok(q.length === 18 && new Set(q.map(x => x.key)).size === 18 && q.every(x => x.opts.length === 4 && x.opts.filter(o => o.ok).length === 1), 'the quiz runs all eighteen, one right answer each'); }
 }
 head('exam prep');

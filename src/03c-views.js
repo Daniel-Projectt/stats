@@ -178,7 +178,8 @@ function renderMockSetup(){
   root.innerHTML = '<div class="quizWrap"><div class="qcard card-corners">'+CORNERS+
     '<div class="qnum">Practice exam</div><p class="qtext">Set it up, then answer across the chapters. Each run is drawn fresh.</p>'+
     '<div class="fifty"><button class="btn primary" type="button" id="mxReal4">The professor&rsquo;s practice quiz &mdash; Chapter 4</button>'+
-      '<p>His own 18 questions from Canvas, word for word, in a new order each time.</p></div>'+
+      '<p>His own 18 questions from Canvas, word for word, with his explanations, in a new order each time. You scored 11 of 18 the first time.</p>'+
+      '<button class="btn" type="button" id="mxReal4m">Only the 7 I missed</button></div>'+
     '<div class="fifty"><button class="btn primary" type="button" id="mxFifty">The 62 &mdash; two from every objective</button>'+
       '<p>Sixty-two questions: two from each of the 31 objectives on the sheets, so nothing is skipped. Drawn fresh each time.</p></div>'+
     '<div class="setup">'+
@@ -193,6 +194,10 @@ function renderMockSetup(){
   segWire("#mxP","data-p",function(v){ mockCfg.topic = v; store.set("mockcfg", JSON.stringify(mockCfg)); });
   $("#mxStart").addEventListener("click", function(){ startMock(null); });
   $("#mxFifty").addEventListener("click", startFifty);
+  $("#mxReal4m").addEventListener("click", function(){
+    engines.mock = makeQuiz($("#mockExam"), function(){ return realQuiz(4, true); }, {showTopic:true, againLabel:"Again, reshuffled", onSetup:renderMockSetup});
+    engines.mock.start(null);
+  });
   $("#mxReal4").addEventListener("click", function(){
     engines.mock = makeQuiz($("#mockExam"), function(){ return realQuiz(4); }, {showTopic:true, againLabel:"Again, reshuffled", onSetup:renderMockSetup});
     engines.mock.start(null);

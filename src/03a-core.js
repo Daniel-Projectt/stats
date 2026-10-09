@@ -148,7 +148,7 @@ function questionsByKeys(keys){
    types  — all / mc / tf / ap
                                                                               */
 /* the professor's own practice quiz for one chapter: every one of his questions, reshuffled */
-function realQuiz(n){ var out = []; QB.forEach(function(b, i){ if(b.real === n) out.push(fromBank(b, i)); }); return shuffle(out); }
+function realQuiz(n, missOnly){ var out = []; QB.forEach(function(b, i){ if(b.real === n && (!missOnly || b.miss)) out.push(fromBank(b, i)); }); return shuffle(out); }
 function mockQuestions(cfg){
   var tps = cfg.topics && cfg.topics.length ? cfg.topics : CHAPTERS.slice();
   var n = cfg.n || 25;

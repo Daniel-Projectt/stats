@@ -125,6 +125,8 @@ ok($$('#mockExam .dots i').length === 18, 'eighteen questions', $$('#mockExam .d
 const realRes = answerQuiz($('#mockExam'), 'his quiz');
 ok(realRes && /\/18/.test(realRes.querySelector('.big').textContent), 'scored out of 18');
 click(realRes.querySelector('.setupbtn'));
+click($('#mxReal4m')); ok($$('#mockExam .dots i').length === 7, 'Only the 7 I missed runs seven questions', $$('#mockExam .dots i').length);
+const missRes = answerQuiz($('#mockExam'), 'his misses'); click(missRes.querySelector('.setupbtn'));
 
 head('exam prep');
 w.localStorage.removeItem('stats.prep');
