@@ -283,3 +283,20 @@ details.work summary{font-size:12px}
 .realcall span{display:block;color:var(--muted);font-size:14.5px;font-style:italic;margin-top:2px}
 .fifty.realall{border:1px solid var(--gold-soft);border-radius:3px;padding:16px;background:var(--surface-2)}
 @media print{ .realcall{display:none!important} }
+
+/* ---- fix my misses ---- */
+.fixcard{max-width:760px;margin:0 auto 12px;background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:16px 18px;box-shadow:var(--shadow)}
+.fixcard.open{border-color:var(--gold)}
+.fixcard.ok{background:var(--surface-2)}
+.fixhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.fixt{font-family:var(--serif);font-size:19px;line-height:1.3}
+.fixfrom{font-family:var(--sans);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.fixpips{display:flex;gap:5px;flex:0 0 auto;margin-top:6px}
+.fixpips i{width:11px;height:11px;border-radius:50%;border:1px solid var(--gold);display:block}
+.fixpips i.on{background:var(--gold)}
+.fixrule{margin:12px 0 12px;font-size:15.5px;line-height:1.55}
+.fixrule > b{display:block;font-family:var(--sans);font-weight:400;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+.fixq{border-top:1px solid var(--line);padding-top:14px;margin-top:4px}
+.fixq .qtext{font-size:17.5px;line-height:1.5;text-align:left;margin:0 0 14px}
+.fixq .feedback{text-align:left}
+.realcall .btn + .btn{margin-left:8px}

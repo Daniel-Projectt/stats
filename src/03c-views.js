@@ -16,7 +16,7 @@ function li(x){ return "<li>"+x+"</li>"; }
 function renderGuide(){
   var done = getJSON("guide", {}), total = 0;
   GUIDE.sections.forEach(function(s){ total += s.items.length; });
-  var html = '<div class="realcall"><div><b>The exam questions are in his practice quizzes</b><span>The professor said the exact questions are all there: 48 questions across Chapters 4, 5 and 6.</span></div><button class="btn primary" type="button" id="gReal">Practice the 48</button></div>'+
+  var html = '<div class="realcall"><div><b>The exam questions are in his practice quizzes</b><span>The professor said the exact questions are all there: 48 questions across Chapters 4, 5 and 6.</span></div><button class="btn primary" type="button" id="gReal">Practice the 48</button><button class="btn" type="button" id="gFix">Fix my misses</button></div>'+
     '<div class="gprog"><span class="count" id="gCount"></span><div class="bar"><i id="gBar" style="width:0"></i></div></div>';
   GUIDE.sections.forEach(function(s){
     html += '<div class="gsec"><h2>'+s.h+'</h2>'+divider();
@@ -61,6 +61,7 @@ function renderGuide(){
   });
   $("#gPrint").addEventListener("click", function(){ window.print(); });
   $("#gReal").addEventListener("click", function(){ goTo("exam/mock"); startRealAll(); });
+  $("#gFix").addEventListener("click", function(){ goTo("fix/run"); });
   progress();
 }
 function goTo(path){
@@ -115,6 +116,49 @@ function renderPrep(){
   function mark(v){ s.marks[idx] = v; s.q++; s.p = 0; s.shown = false; prepSave(s); renderPrep(); var top = $("#prepRoot"); if(top && top.scrollIntoView) top.scrollIntoView({behavior:"smooth", block:"start"}); }
   if($("#prepYes")) $("#prepYes").addEventListener("click", function(){ mark(1); });
   if($("#prepNo")) $("#prepNo").addEventListener("click", function(){ mark(0); });
+}
+
+/* ================================================================ fix my misses: ten skills, three in a row each */
+var FIX_NEED = 3, fixOpen = null, fixQ = null, fixAnswered = false;
+function fixState(){ var s = getJSON("fix", {}); return (s && typeof s === "object") ? s : {}; }
+function renderFix(){
+  var st = fixState(), done = FIX.filter(function(k){ return (st[k.id] || 0) >= FIX_NEED; }).length;
+  var html = '<div class="gprog"><span class="count">Fixed <b>'+done+' of '+FIX.length+'</b></span><div class="bar"><i style="width:'+(done / FIX.length * 100)+'%"></i></div></div>';
+  FIX.forEach(function(k){
+    var n = Math.min(st[k.id] || 0, FIX_NEED), ok = n >= FIX_NEED, open = fixOpen === k.id;
+    html += '<div class="fixcard'+(ok ? " ok" : "")+(open ? " open" : "")+'" data-fix="'+k.id+'">'+
+      '<div class="fixhead"><div><div class="fixt">'+k.t+'</div><div class="fixfrom">'+k.from+'</div></div>'+
+        '<span class="fixpips" aria-label="'+n+' of '+FIX_NEED+' in a row">'+[0, 1, 2].map(function(i){ return '<i'+(i < n ? ' class="on"' : '')+'></i>'; }).join("")+'</span></div>'+
+      '<p class="fixrule"><b>The rule</b>'+k.rule+'</p>';
+    if(open && fixQ){
+      html += '<div class="fixq"><p class="qtext">'+fixQ.text+'</p><div class="opts">'+
+        fixQ.opts.map(function(o, i){ return '<button class="opt'+(fixAnswered ? (o.ok ? " correct" : (fixQ.picked === i ? " wrong" : "")) : "")+'" type="button" data-fo="'+i+'"'+(fixAnswered ? " disabled" : "")+'><span class="k">'+(i + 1)+'</span>'+o.html+'</button>'; }).join("")+'</div>'+
+        (fixAnswered ? '<p class="feedback">'+(fixQ.opts[fixQ.picked].ok ? "<b>Correct.</b> " : "<b>Not this one.</b> ")+fixQ.explain+'</p>'+
+          '<div class="toolbar" style="justify-content:center"><button class="btn primary" type="button" data-fnext="1">'+(ok ? "One more" : "Next problem")+'</button><button class="btn" type="button" data-fclose="1">Close</button></div>' : '')+'</div>';
+    } else {
+      html += '<div class="toolbar" style="justify-content:center"><button class="btn'+(ok ? "" : " primary")+'" type="button" data-fstart="'+k.id+'">'+(ok ? "Fixed — practice again" : (n ? "Keep going" : "Practice"))+'</button></div>';
+    }
+    html += '</div>';
+  });
+  html += '<div class="toolbar" style="justify-content:center;margin-top:18px"><button class="btn" type="button" id="fixReset">Start all ten over</button></div>';
+  $("#fixRoot").innerHTML = html;
+  function ask(id){ fixOpen = id; fixQ = FIX.filter(function(k){ return k.id === id; })[0].gen(); fixAnswered = false; renderFix(); }
+  $$("#fixRoot [data-fstart]").forEach(function(b){ b.addEventListener("click", function(){ ask(b.getAttribute("data-fstart")); }); });
+  $$("#fixRoot [data-fo]").forEach(function(b){ b.addEventListener("click", function(){
+    if(fixAnswered) return;
+    var i = +b.getAttribute("data-fo"), s = fixState(); fixQ.picked = i; fixAnswered = true;
+    s[fixOpen] = fixQ.opts[i].ok ? Math.min(FIX_NEED, (s[fixOpen] || 0) + 1) : 0;      /* a miss resets the streak */
+    store.set("fix", JSON.stringify(s)); renderFix();
+  }); });
+  if($("#fixRoot [data-fnext]")) $("#fixRoot [data-fnext]").addEventListener("click", function(){ ask(fixOpen); });
+  if($("#fixRoot [data-fclose]")) $("#fixRoot [data-fclose]").addEventListener("click", function(){ fixOpen = null; fixQ = null; renderFix(); });
+  $("#fixReset").addEventListener("click", function(){ store.set("fix", "{}"); fixOpen = null; fixQ = null; renderFix(); });
+}
+function fixKeys(e){
+  if(!fixOpen || !fixQ) return false;
+  if(/^[1-4]$/.test(e.key) && !fixAnswered){ var b = $$("#fixRoot [data-fo]")[+e.key - 1]; if(b){ b.click(); return true; } }
+  if(e.key === "Enter" && fixAnswered){ var n = $("#fixRoot [data-fnext]"); if(n){ n.click(); return true; } }
+  return false;
 }
 
 /* ================================================================ the two essay questions */
@@ -234,12 +278,12 @@ function renderMockSetup(){
 
 /* ================================================================ wiring */
 var engines = {};
-renderGuide(); renderKit(); renderPrep(); renderEssays();
+renderGuide(); renderKit(); renderPrep(); renderEssays(); renderFix();
 
 var ON_SHOW = {"exam/mock":function(){ if(!engines.mock) renderMockSetup(); }};
-var KEYS = {"exam/mock":function(e){ return engines.mock ? engines.mock.keys(e) : false; }};
-var TOPICS = ["guide","exam","prep","kit"];
-var currentTopic = "guide", currentMode = {guide:"overview", kit:"card", exam:"mock", prep:"run"};
+var KEYS = {"exam/mock":function(e){ return engines.mock ? engines.mock.keys(e) : false; }, "fix/run":fixKeys};
+var TOPICS = ["guide","exam","fix","prep","kit"];
+var currentTopic = "guide", currentMode = {guide:"overview", kit:"card", exam:"mock", prep:"run", fix:"run"};
 function showMode(topic, mode){
   currentMode[topic] = mode;
   $$('.seg[data-modes="'+topic+'"] button').forEach(function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-mode") === mode)); });

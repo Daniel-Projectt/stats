@@ -46,7 +46,7 @@ function answerQuiz(root, label) {
 head('landing');
 ok(errors.length === 0, 'no errors while loading', errors.join(' || '));
 ok(visible($('#topic-guide')) && !visible($('#topic-exam')) && !visible($('#topic-kit')), 'opens on the Objectives');
-ok($$('.topic-btn').length === 4 && $$('.topic-btn').map(b => b.textContent).join('|') === 'Objectives|Practice|Exam Prep|Exam Kit', 'four tabs');
+ok($$('.topic-btn').length === 5 && $$('.topic-btn').map(b => b.textContent).join('|') === 'Objectives|Practice|Fix My Misses|Exam Prep|Exam Kit', 'five tabs');
 const items = $$('#guideRoot .gitem');
 ok(items.length === 31, 'all thirty-one objectives', items.length);
 ok(/0 of 31/.test($('#gCount').textContent), 'progress starts at 0 of 31', $('#gCount').textContent);
@@ -80,7 +80,7 @@ click($('#guideRoot [data-go="exam/mock"]'));
 ok(visible(panel('exam/mock')) && !!$('#mxStart'), 'the practice button opens the practice setup');
 
 head('every tab');
-['guide', 'exam', 'prep', 'kit'].forEach(t => { topic(t); ok(visible($('#topic-' + t)) && $$('.topic').filter(visible).length === 1, 'tab opens alone: ' + t); });
+['guide', 'exam', 'fix', 'prep', 'kit'].forEach(t => { topic(t); ok(visible($('#topic-' + t)) && $$('.topic').filter(visible).length === 1, 'tab opens alone: ' + t); });
 ['card', 'tools', 'which'].forEach(m => { mode('kit', m); ok(visible(panel('kit/' + m)) && $$('#topic-kit .panel').filter(visible).length === 1 && panel('kit/' + m).textContent.trim().length > 20, 'exam kit mode: ' + m); });
 ok(errors.length === 0, 'no errors after visiting every tab', errors.join(' || '));
 
@@ -141,6 +141,37 @@ const m5Res = answerQuiz($('#mockExam'), 'his chapter 5 misses'); click(m5Res.qu
 
 click($('#mxReal6')); ok($$('#mockExam .dots i').length === 16, 'his Chapter 6 quiz: sixteen questions', $$('#mockExam .dots i').length);
 const r6Res = answerQuiz($('#mockExam'), 'his chapter 6 quiz'); click(r6Res.querySelector('.setupbtn'));
+
+head('fix my misses');
+w.localStorage.removeItem('stats.fix');
+topic('guide'); click($('#gFix'));
+const fx = () => $('#fixRoot');
+ok(visible(fx()) && fx().querySelectorAll('.fixcard').length === 10 && /Fixed 0 of 10/.test(fx().textContent), 'ten skills, none fixed yet');
+ok(fx().querySelectorAll('.fixrule').length === 10 && !fx().querySelector('.fixq'), 'each shows its rule; no problem open');
+const card = id => fx().querySelector('.fixcard[data-fix="' + id + '"]');
+const answer = (id, right) => { const os = Array.from(card(id).querySelectorAll('[data-fo]')); click(os.find(o => /* pick by trying */ true && false) || os[0]); };
+// answer a problem correctly by trying: click a choice, read whether it was right
+function solve(id, wantRight) {
+  if (!card(id).querySelector('.fixq')) click(card(id).querySelector('[data-fstart]')); else if (card(id).querySelector('[data-fnext]')) click(card(id).querySelector('[data-fnext]'));
+  const before = card(id).querySelectorAll('.fixpips i.on').length;
+  // the page does not reveal the answer beforehand, so read it from the engine's own marking after one click
+  const os = Array.from(card(id).querySelectorAll('[data-fo]'));
+  ok(os.length === 4 && !card(id).querySelector('.feedback'), id + ': a problem with four choices');
+  click(os[0]);
+  const gotRight = card(id).querySelector('[data-fo].correct') === card(id).querySelectorAll('[data-fo]')[0];
+  ok(card(id).querySelectorAll('[data-fo].correct').length === 1 && /^(Correct|Not this one)\./.test(card(id).querySelector('.feedback').textContent), id + ': the right choice is shown with plain feedback');
+  const after = card(id).querySelectorAll('.fixpips i.on').length;
+  ok(gotRight ? after === Math.min(3, before + 1) : after === 0, id + ': a right answer adds to the streak, a miss resets it', before + ' -> ' + after + ' right=' + gotRight);
+  return gotRight;
+}
+['bayes', 'rescale', 'ev', 'atleast', 'count'].forEach(id => { for (let i = 0; i < 6; i++) solve(id); });
+ok(/"bayes":\d/.test(w.localStorage.getItem('stats.fix') || ''), 'the streaks are saved');
+// force one skill to three in a row through the saved state, then check the page reflects it
+w.localStorage.setItem('stats.fix', JSON.stringify({ neither: 3, or: 2 }));
+topic('guide'); topic('fix'); click($('#fixReset')); w.localStorage.setItem('stats.fix', JSON.stringify({ neither: 3, or: 2 })); topic('guide'); click($('#gFix'));
+click(card('or').querySelector('[data-fstart]')); click(card('or').querySelector('[data-fclose]') || card('or').querySelectorAll('[data-fo]')[0]);
+ok(card('neither').classList.contains('ok') && /Fixed 1 of 10/.test(fx().textContent) && card('neither').querySelectorAll('.fixpips i.on').length === 3, 'three in a row marks a skill fixed');
+click($('#fixReset')); ok(/Fixed 0 of 10/.test(fx().textContent) && w.localStorage.getItem('stats.fix') === '{}', 'Start all ten over clears it');
 
 head('exam prep');
 w.localStorage.removeItem('stats.prep');

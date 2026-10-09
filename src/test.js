@@ -208,7 +208,46 @@ ok(/<b>Correct\.<\/b>/.test(src) && /<b>Not this one\.<\/b>/.test(src), 'answer 
 
 // ---------- 8. markup ----------
 head('markup');
-ok((html.match(/class="topic-btn"/g) || []).length === 4, 'four tabs: objectives, practice, exam prep, exam kit');
+ok((html.match(/class="topic-btn"/g) || []).length === 5, 'five tabs: objectives, practice, fix my misses, exam prep, exam kit');
+// ---------- fix my misses: ten skills, every generated answer recomputed here from its numbers ----------
+head('fix my misses');
+{
+  const F = A.FIX, xs = s => String(s).replace(/<[^>]+>/g, ''), fa = n => n < 2 ? 1 : n * fa(n - 1);
+  ok(F.length === 10 && F.map(k => k.id).join() === 'bayes,neither,or,none,count,rescale,scale,poisson,ev,atleast' && F.every(k => k.t && k.rule.length > 40 && /Chapter [45] quiz, question/.test(k.from)), 'ten skills, each with a rule and the quiz question it comes from');
+  const money = x => (x < 0 ? '−$' : '$') + Math.abs(Math.round(x)).toLocaleString('en-US'), int = x => Math.round(x).toLocaleString('en-US');
+  const want = {
+    bayes: v => (v.a * v.r1 / (v.a * v.r1 + (1 - v.a) * v.r2)).toFixed(3),
+    neither: v => ((1 - v.p1) * (1 - v.p2)).toFixed(3),
+    or: v => ((v.N + v.d2) / (2 * v.N)).toFixed(3),
+    none: v => { const g = v.N - v.k; return (g / v.N * (g - 1) / (v.N - 1) * (g - 2) / (v.N - 2)).toFixed(4); },
+    count: v => { let p = 1; for (let i = 0; i < v.r; i++) p *= v.n - i; return int(v.roles ? p : p / fa(v.r)); },
+    rescale: v => { const m = Math.round(v.rate * v.f * 1000) / 1000; return v.number ? Math.exp(-m).toFixed(4) : 'POISSON.DIST(' + v.x + ', ' + m + ', FALSE)'; },
+    scale: v => 'Mean × ' + v.k + ', variance × ' + v.k + ', standard deviation × ' + (v.k === 4 ? '2' : v.k === 9 ? '3' : '√' + v.k),
+    poisson: v => v.right,
+    ev: v => money(v.p * v.A - (1 - v.p) * v.B),
+    atleast: v => '1 − BINOM.DIST(' + ((v.more ? v.k + 1 : v.k) - 1) + ', ' + v.n + ', ' + v.p + ', TRUE)'
+  };
+  F.forEach(k => {
+    const texts = new Set();
+    for (let r = 0; r < 300; r++) {
+      const q = k.gen(), right = q.opts.filter(o => o.ok), all = q.opts.map(o => o.html);
+      texts.add(q.text + '|' + right[0].html);
+      ok(q.opts.length === 4 && right.length === 1 && new Set(all).size === 4, k.id + ': four distinct choices, one right', all.join(' | '));
+      ok(right[0].html === want[k.id](q.vals), k.id + ': the right answer recomputed', right[0].html + ' vs ' + want[k.id](q.vals) + ' :: ' + JSON.stringify(q.vals));
+      ok(q.text.length > 40 && xs(q.explain).length > 60 && (k.id === 'scale' || xs(q.explain).includes(xs(right[0].html))), k.id + ': the explanation shows the answer', xs(q.explain));
+      if (k.id === 'neither') ok(Math.abs(q.vals.p1 + q.vals.p2 - 1) > 1e-9, 'neither: both and neither are never the same number');
+      ok(all.every(x => !/NaN|undefined|Infinity/.test(x)) && !/NaN|undefined/.test(q.text + q.explain), k.id + ': no broken numbers');
+      if (['bayes', 'neither', 'or', 'none'].includes(k.id)) ok(all.every(x => +x >= 0 && +x <= 1), k.id + ': every choice is a possible probability', all.join(' | '));
+    }
+    ok(texts.size >= (k.id === 'scale' ? 4 : 5), k.id + ': problems vary', texts.size);
+  });
+  // the named mistakes are among the choices
+  for (let r = 0; r < 200; r++) {
+    const b = A.FIX[0].gen(), v = b.vals; ok(b.opts.some(o => o.html === (v.a * v.r1).toFixed(3)) || b.opts.some(o => o.html === (v.r1 / (v.r1 + v.r2)).toFixed(3)), 'bayes offers the unweighted or the undivided mistake');
+    const e = A.FIX[8].gen(), w = e.vals; ok(e.opts.some(o => o.html === money(w.p * w.A)), 'expected value offers the forgot-the-loss mistake');
+    const n = A.FIX[3].gen(), u = n.vals; ok(n.opts.some(o => o.html === Math.pow((u.N - u.k) / u.N, 3).toFixed(4)), 'none offers the with-replacement mistake');
+  }
+}
 // ---------- exam prep: his 31-question practice exam, every number recomputed ----------
 head('the professor’s practice quiz, chapter 4');
 {
@@ -347,7 +386,7 @@ head('exam prep');
   ea(1, '12 minutes'); ea(1, String(6 / Math.sqrt(36)) + ' minute'); ok(36 > 30, 'n over 30 for the central limit theorem');
   ok(E.every(e => e.steps.length === 5 && e.answer.length === 5), 'a five-step template and a five-paragraph answer for each');
 }
-['guide', 'exam', 'prep', 'kit'].forEach(t => ok(html.includes('data-topic="' + t + '"') && html.includes('id="topic-' + t + '"'), 'tab and section: ' + t));
+['guide', 'exam', 'fix', 'prep', 'kit'].forEach(t => ok(html.includes('data-topic="' + t + '"') && html.includes('id="topic-' + t + '"'), 'tab and section: ' + t));
 ok(!/id="topic-c[456]"|id="c[456](Notes|Cards|Match|Quiz)"/.test(html), 'the chapter tabs, notes, flashcards and matching are gone');
 ok(/data-topic="guide"\s+aria-selected="true"/.test(html), 'Guide is the default tab');
 ok(html.includes('id="flourish"') && html.includes('id="emblem"') && html.includes('class="emblem"'), 'ornaments and the earth emblem present');
