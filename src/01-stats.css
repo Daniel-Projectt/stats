@@ -243,3 +243,20 @@ details.work summary{font-size:12px}
 .gex p:last-child{margin-bottom:0}
 .gex code{font-family:Consolas,"Courier New",monospace;font-size:.9em;overflow-wrap:anywhere}
 @media print{ .gans[hidden]{display:block!important} .gopen::after{content:""} }
+
+/* ---- exam prep ---- */
+.qcard.prep{text-align:left}
+.qcard.prep .qnum,.qcard.prep .qtags{text-align:center;justify-content:center}
+.qcard.prep .qtext{text-align:left;font-size:18px}
+.prepscore{text-align:center;font-family:var(--sans);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:6px 0 0}
+.preparts{margin:14px 0 0;padding-left:1.4em}
+.preparts li{margin:0 0 16px;padding-left:4px}
+.preparts li::marker{color:var(--gold);font-family:var(--sans);font-size:13px}
+.preparts .pq{margin:0;font-size:17px;line-height:1.5}
+.preparts li:not(.cur) .pq{color:var(--ink-soft)}
+.preparts .pa,.preparts .ptrap,.phint{margin:8px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:3px;background:var(--surface-2);font-size:15.5px;line-height:1.55}
+.preparts .pa > b:first-child,.preparts .ptrap > b:first-child,.phint > b:first-child{display:block;font-family:var(--sans);font-weight:400;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+.preparts .ptrap{border-color:var(--gold-soft)}
+.preparts code{font-family:Consolas,"Courier New",monospace;font-size:.9em;overflow-wrap:anywhere}
+.phint[hidden]{display:none}
+.prepfoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin-top:18px}

@@ -46,7 +46,7 @@ function answerQuiz(root, label) {
 head('landing');
 ok(errors.length === 0, 'no errors while loading', errors.join(' || '));
 ok(visible($('#topic-guide')) && !visible($('#topic-exam')) && !visible($('#topic-kit')), 'opens on the Objectives');
-ok($$('.topic-btn').length === 3 && $$('.topic-btn').map(b => b.textContent).join('|') === 'Objectives|Practice|Exam Kit', 'three tabs');
+ok($$('.topic-btn').length === 4 && $$('.topic-btn').map(b => b.textContent).join('|') === 'Objectives|Practice|Exam Prep|Exam Kit', 'four tabs');
 const items = $$('#guideRoot .gitem');
 ok(items.length === 31, 'all thirty-one objectives', items.length);
 ok(/0 of 31/.test($('#gCount').textContent), 'progress starts at 0 of 31', $('#gCount').textContent);
@@ -74,7 +74,7 @@ click($('#guideRoot [data-go="exam/mock"]'));
 ok(visible(panel('exam/mock')) && !!$('#mxStart'), 'the practice button opens the practice setup');
 
 head('every tab');
-['guide', 'exam', 'kit'].forEach(t => { topic(t); ok(visible($('#topic-' + t)) && $$('.topic').filter(visible).length === 1, 'tab opens alone: ' + t); });
+['guide', 'exam', 'prep', 'kit'].forEach(t => { topic(t); ok(visible($('#topic-' + t)) && $$('.topic').filter(visible).length === 1, 'tab opens alone: ' + t); });
 ['card', 'tools', 'which'].forEach(m => { mode('kit', m); ok(visible(panel('kit/' + m)) && $$('#topic-kit .panel').filter(visible).length === 1 && panel('kit/' + m).textContent.trim().length > 20, 'exam kit mode: ' + m); });
 ok(errors.length === 0, 'no errors after visiting every tab', errors.join(' || '));
 
@@ -115,6 +115,41 @@ ok(!!fRes, 'the fifty reaches results');
 const fSec = fRes.querySelectorAll('.tbl')[0];
 ok(fSec && fSec.querySelectorAll('tr').length === 31, 'the results list all thirty-one objectives', fSec && fSec.querySelectorAll('tr').length);
 ok(Array.from(fSec.querySelectorAll('.num')).every(td => parseInt(td.textContent.split('/')[1], 10) >= 2), 'every section got at least two questions');
+
+head('exam prep');
+w.localStorage.removeItem('stats.prep');
+topic('guide'); topic('prep');
+const pr = () => $('#prepRoot');
+ok(visible(pr()) && /Question 1 of 31/.test(pr().textContent) && /4-1/.test(pr().querySelector('.qtag').textContent), 'starts on question 1 of 31, tagged with its objective');
+ok(pr().querySelectorAll('.preparts li').length === 1 && !pr().querySelector('.pa') && !!$('#prepShow'), 'one part at a time, answer hidden');
+click($('#prepShow'));
+ok(/1, 2, 3, 4, 5, 6, 7, 8/.test(pr().querySelector('.pa').textContent) && !!$('#prepNext') && !$('#prepYes'), 'the answer appears, then Next part');
+click($('#prepNext'));
+ok(pr().querySelectorAll('.preparts li').length === 2 && pr().querySelectorAll('.pa').length === 1 && !!$('#prepShow'), 'the next part appears; earlier answers stay visible');
+click($('#prepShow')); click($('#prepNext')); click($('#prepShow'));
+ok(!!$('#prepYes') && !!$('#prepNo') && !$('#prepNext'), 'after the last part it asks whether you got it');
+click($('#prepYes'));
+ok(/Question 2 of 31/.test(pr().textContent) && /"0":1/.test(w.localStorage.getItem('stats.prep')), 'marked, saved, and on to question 2');
+// walk the rest: miss question 5 and question 16, get the others
+let sawScore = false, sawTrap = false, sawHint = false, guardP = 0;
+while (!pr().querySelector('.result') && guardP++ < 400) {
+  if (/So far: \d+ of 8/.test(pr().textContent)) sawScore = true;
+  if ($('#prepHint')) { click($('#prepHint')); if (!$('#prepHintBox').hidden && $('#prepHintBox').textContent.length > 30) sawHint = true; }
+  if ($('#prepShow')) { click($('#prepShow')); continue; }
+  if (pr().querySelector('.ptrap')) sawTrap = true;
+  if ($('#prepNext')) { click($('#prepNext')); continue; }
+  const n = +pr().querySelector('.qnum').textContent.match(/Question (\d+)/)[1];
+  click((n === 5 || n === 16) ? $('#prepNo') : $('#prepYes'));
+}
+ok(sawScore, 'a running score shows after every eight questions');
+ok(sawTrap && sawHint, 'traps are named and hints open');
+ok(pr().querySelector('.result .big').textContent === '29/31', 'the score is out of 31', pr().querySelector('.result .big').textContent);
+ok(pr().querySelectorAll('.misslist > div').length === 2 && /4-2/.test(pr().querySelector('.misslist').textContent) && /5-2/.test(pr().querySelector('.misslist').textContent), 'the two missed objectives are listed');
+click($('#prepMiss'));
+ok(/Question 1 of 2/.test(pr().textContent) && /marbles/.test(pr().textContent), 'Try the misses again runs just those two');
+topic('guide'); topic('prep');
+ok(/Question 1 of 2/.test(pr().textContent), 'it remembers where you were');
+w.localStorage.removeItem('stats.prep');
 
 head('remembers where you were');
 topic('kit'); mode('kit', 'which');

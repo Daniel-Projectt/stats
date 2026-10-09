@@ -208,8 +208,49 @@ ok(/<b>Correct\.<\/b>/.test(src) && /<b>Not this one\.<\/b>/.test(src), 'answer 
 
 // ---------- 8. markup ----------
 head('markup');
-ok((html.match(/class="topic-btn"/g) || []).length === 3, 'three tabs: objectives, practice, exam kit');
-['guide', 'exam', 'kit'].forEach(t => ok(html.includes('data-topic="' + t + '"') && html.includes('id="topic-' + t + '"'), 'tab and section: ' + t));
+ok((html.match(/class="topic-btn"/g) || []).length === 4, 'four tabs: objectives, practice, exam prep, exam kit');
+// ---------- exam prep: his 31-question practice exam, every number recomputed ----------
+head('exam prep');
+{
+  const P = A.PREP, xs = s => String(s).replace(/<[^>]+>/g, ''), ans = (q, p) => xs(P[q - 1].parts[p][1]);
+  const has = (q, p, v) => ok(ans(q, p).includes(v), 'exam prep Q' + q + ' part ' + 'abcde'[p] + ' shows ' + v, ans(q, p));
+  ok(P.length === 31 && P.every(q => q.obj && q.t && q.parts.length >= 1 && q.parts.length <= 5 && q.parts.every(p => p[0] && p[1])), 'thirty-one questions, each with one to five parts');
+  ok(P.map(q => q.obj).join() === '4-1,4-1,4-1,4-2,4-2,4-3,4-3,4-3,4-4,4-4,5-1,5-1,5-1,5-1,5-2,5-2,5-2,5-3,5-3,5-3,6-1,6-1,6-2,6-2,6-3,6-3,6-3,6-4,6-4,6-4,6-5', 'in the order of the objectives');
+  ok(P.reduce((n, q) => n + q.parts.length, 0) === 93, 'ninety-three parts in all', P.reduce((n, q) => n + q.parts.length, 0));
+  ok(Object.keys(A.PREP_TRAPS).length === 7 && P.every(q => q.parts.every(p => !p[2] || A.PREP_TRAPS[p[2]])), 'the seven traps, and every tagged part names a real one');
+  ok(P.filter(q => q.hint).length === 10, 'ten hints from his study notes', P.filter(q => q.hint).length);
+  const f = n => n < 2 ? 1 : n * f(n - 1), C = (n, r) => f(n) / (f(r) * f(n - r)), r4 = x => x.toFixed(4);
+  const b = (x, n, p) => C(n, x) * Math.pow(p, x) * Math.pow(1 - p, n - x), bc = (x, n, p) => { let s = 0; for (let k = 0; k <= x; k++) s += b(k, n, p); return s; };
+  const po = (x, m) => Math.pow(m, x) * Math.exp(-m) / f(x), pc = (x, m) => { let s = 0; for (let k = 0; k <= x; k++) s += po(k, m); return s; };
+  const erf2 = x => { const s = x < 0 ? -1 : 1; x = Math.abs(x); const tt = 1 / (1 + 0.3275911 * x); return s * (1 - (((((1.061405429 * tt - 1.453152027) * tt) + 1.421413741) * tt - 0.284496736) * tt + 0.254829592) * tt * Math.exp(-x * x)); };
+  const Phi = z => 0.5 * (1 + erf2(z / Math.SQRT2));
+  has(2, 0, (1 / 6).toFixed(3)); has(2, 1, (18 / 360).toFixed(2));
+  has(4, 0, (22 / 52).toFixed(3)); ok(12 + 13 - 3 === 22, 'face card or diamond: 22 cards');
+  has(5, 0, (6 / 10 * 5 / 9).toFixed(3)); has(5, 1, (0.6 * 0.6).toFixed(2));
+  has(6, 0, r4(Math.pow(0.85, 6))); has(6, 0, r4(1 - Math.pow(0.85, 6))); has(6, 1, r4(6 * 0.15 * Math.pow(0.85, 5)));
+  has(7, 0, (90 / 250).toFixed(2)); has(7, 1, (90 / 150).toFixed(2)); has(7, 2, (90 / 120).toFixed(2));
+  ok(0.04 * 1000 === 40 && Math.round(0.85 * 40) === 34 && Math.round(0.10 * 960) === 96, 'the reject pile: 34 and 96');
+  has(8, 2, (34 / 130).toFixed(3)); ok(Math.abs(0.85 * 0.04 / (0.85 * 0.04 + 0.10 * 0.96) - 34 / 130) < 1e-12, 'the Excel formula gives the same number');
+  has(9, 0, String(5 * 3 * 2)); has(9, 1, f(7).toLocaleString('en-US'));
+  has(10, 0, String(9 * 8)); has(10, 1, String(C(9, 4))); has(10, 2, (10000).toLocaleString('en-US'));
+  ok(Math.abs(0.25 + 0.35 + 0.30 + 0.15 - 1.05) < 1e-9 && Math.abs(0.6 + 0.5 - 0.1 - 1) < 1e-9, 'the two invalid distributions fail for the stated reasons');
+  const m13 = 0 * 0.2 + 1 * 0.5 + 2 * 0.3, e13 = 0 * 0.2 + 1 * 0.5 + 4 * 0.3;
+  has(13, 0, m13.toFixed(1)); has(13, 1, (e13 - m13 * m13).toFixed(2)); has(13, 2, Math.sqrt(e13 - m13 * m13).toFixed(1));
+  ok(Math.abs(95 * 0.02 + (-5) * 0.98 - (-3)) < 1e-9, 'raffle: −$3 per ticket'); has(14, 0, '−$3');
+  has(16, 0, r4(b(3, 12, 0.25))); has(16, 1, r4(bc(3, 12, 0.25))); has(16, 2, r4(bc(2, 12, 0.25))); has(16, 3, r4(1 - bc(3, 12, 0.25))); has(16, 4, r4(1 - bc(5, 12, 0.25)));
+  has(17, 0, String(12 * 0.25)); has(17, 0, Math.sqrt(12 * 0.25 * 0.75).toFixed(1));
+  has(19, 0, String(6 * 20 / 60)); has(19, 1, r4(po(0, 2))); has(19, 2, r4(po(3, 6))); has(19, 3, r4(1 - pc(1, 6)));
+  has(20, 0, String(Math.sqrt(9)));
+  has(22, 0, r4(Phi(1.25))); has(22, 1, r4(1 - Phi(1.25))); has(22, 2, r4(Phi(1.25) - Phi(-1.25))); ok(Math.abs(Phi(0.8416) - 0.80) < 1e-4, 'the 80th percentile is z = 0.84');
+  has(23, 0, String((44 - 40) / 8)); has(23, 1, r4(1 - Phi(0.5))); has(23, 2, r4(1 - Phi(2)));
+  has(24, 0, (40 + 1.2816 * 8).toFixed(1)); has(24, 1, (40 - 0.6745 * 8).toFixed(1)); ok(Math.abs(Phi(1.2816) - 0.90) < 1e-4 && Math.abs(Phi(-0.6745) - 0.25) < 1e-4, 'the two cutoffs use the right z');
+  has(27, 0, String(3 * 3));
+  has(29, 0, String(8 / Math.sqrt(16))); has(29, 0, String(8 / Math.sqrt(64)));
+  has(30, 0, r4(1 - Phi(0.5))); has(30, 1, r4(1 - Phi((44 - 40) / (8 / Math.sqrt(16)))));
+  ok(P[15].parts[3][2] === 7 && P[21].parts[1][2] === 1 && P[29].parts[1][2] === 3 && P[25].parts[1][2] === 4 && P[26].parts[0][2] === 5 && P[22].parts[2][2] === 6, 'his traps are attached to the parts where he falls in');
+  ok(!/flagged/i.test(JSON.stringify(P[7])), 'the Bayes question says “reject pile”, never “flagged”');
+}
+['guide', 'exam', 'prep', 'kit'].forEach(t => ok(html.includes('data-topic="' + t + '"') && html.includes('id="topic-' + t + '"'), 'tab and section: ' + t));
 ok(!/id="topic-c[456]"|id="c[456](Notes|Cards|Match|Quiz)"/.test(html), 'the chapter tabs, notes, flashcards and matching are gone');
 ok(/data-topic="guide"\s+aria-selected="true"/.test(html), 'Guide is the default tab');
 ok(html.includes('id="flourish"') && html.includes('id="emblem"') && html.includes('class="emblem"'), 'ornaments and the earth emblem present');

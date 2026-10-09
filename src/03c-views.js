@@ -68,6 +68,53 @@ function goTo(path){
   window.scrollTo({top:$(".topics").offsetTop - 8, behavior:"smooth"});
 }
 
+/* ================================================================ exam prep: one part at a time, self-checked */
+function prepState(){ var s = getJSON("prep", null); return (s && typeof s.q === "number" && s.marks) ? s : {q:0, p:0, shown:false, marks:{}, only:null}; }
+function prepSave(s){ store.set("prep", JSON.stringify(s)); }
+function prepOrder(s){ return s.only && s.only.length ? s.only : PREP.map(function(_, i){ return i; }); }
+function renderPrep(){
+  var s = prepState(), order = prepOrder(s), root = $("#prepRoot");
+  function score(){ var n = 0; order.forEach(function(i){ if(s.marks[i] === 1) n++; }); return n; }
+  if(s.q >= order.length){
+    var missed = order.filter(function(i){ return s.marks[i] !== 1; });
+    root.innerHTML = '<div class="quizWrap"><div class="result card-corners">'+CORNERS+
+      '<div class="big">'+score()+'/'+order.length+'</div><div class="rsub">'+(order.length === PREP.length ? 'objectives' : 'of the ones you missed')+'</div>'+
+      (missed.length ? '<p class="verdict">Go back over these, then try them again.</p><div class="misslist">'+missed.map(function(i){ return '<div><span class="g">'+PREP[i].obj+'</span><span class="t"><b>'+PREP[i].t+'</b>Question '+(i+1)+'</span></div>'; }).join("")+'</div>'
+                     : '<p class="verdict">Every one. You are ready.</p>')+
+      '<div class="toolbar" style="margin:26px 0 0">'+(missed.length ? '<button class="btn primary" type="button" id="prepMiss">Try the misses again</button>' : '')+'<button class="btn" type="button" id="prepAgain">Start over</button></div></div></div>';
+    if($("#prepMiss")) $("#prepMiss").addEventListener("click", function(){ var m = {}; prepSave({q:0, p:0, shown:false, marks:m, only:missed}); renderPrep(); });
+    $("#prepAgain").addEventListener("click", function(){ prepSave({q:0, p:0, shown:false, marks:{}, only:null}); renderPrep(); });
+    return;
+  }
+  var idx = order[s.q], Q = PREP[idx], last = s.p >= Q.parts.length - 1;
+  var done = s.q, sofar = (done > 0 && done % 8 === 0) ? '<p class="prepscore">So far: <b>'+score()+' of '+done+'</b></p>' : '';
+  var html = '<div class="quizWrap"><div class="qcard card-corners prep">'+CORNERS+
+    '<div class="qnum">Question '+(s.q+1)+' of '+order.length+'</div>'+
+    '<div class="qtags"><span class="qtag">'+Q.obj+'</span><span class="qtag sec">'+Q.t+'</span></div>'+sofar+
+    (Q.stem ? '<p class="qtext">'+Q.stem+'</p>' : '')+
+    '<ol class="preparts" type="a">';
+  Q.parts.forEach(function(p, i){
+    if(i > s.p) return;
+    var open = i < s.p || s.shown;
+    html += '<li'+(i === s.p ? ' class="cur"' : '')+'><p class="pq">'+p[0]+'</p>'+
+      (open ? '<p class="pa"><b>Answer</b>'+p[1]+'</p>'+(p[2] ? '<p class="ptrap"><b>Your trap</b>'+PREP_TRAPS[p[2]]+'</p>' : '') : '')+'</li>';
+  });
+  html += '</ol>'+
+    (Q.hint ? '<p class="phint" id="prepHintBox" hidden><b>From your notes</b>'+Q.hint+'</p>' : '')+
+    '<div class="qfoot prepfoot">';
+  if(!s.shown) html += (Q.hint ? '<button class="btn" type="button" id="prepHint">Hint</button>' : '')+'<button class="btn primary" type="button" id="prepShow">Show answer</button>';
+  else if(!last) html += '<button class="btn primary" type="button" id="prepNext">Next part &rsaquo;</button>';
+  else html += '<span class="label">Did you get this question?</span><button class="btn primary" type="button" id="prepYes">Got it</button><button class="btn" type="button" id="prepNo">Missed it</button>';
+  html += '</div></div></div>';
+  root.innerHTML = html;
+  if($("#prepHint")) $("#prepHint").addEventListener("click", function(){ $("#prepHintBox").hidden = false; $("#prepHint").hidden = true; });
+  if($("#prepShow")) $("#prepShow").addEventListener("click", function(){ s.shown = true; prepSave(s); renderPrep(); });
+  if($("#prepNext")) $("#prepNext").addEventListener("click", function(){ s.p++; s.shown = false; prepSave(s); renderPrep(); });
+  function mark(v){ s.marks[idx] = v; s.q++; s.p = 0; s.shown = false; prepSave(s); renderPrep(); var top = $("#prepRoot"); if(top && top.scrollIntoView) top.scrollIntoView({behavior:"smooth", block:"start"}); }
+  if($("#prepYes")) $("#prepYes").addEventListener("click", function(){ mark(1); });
+  if($("#prepNo")) $("#prepNo").addEventListener("click", function(){ mark(0); });
+}
+
 /* ================================================================ practice exam */
 var mockCfg = getJSON("mockcfg", {n:25, types:"all", topic:"all"});
 function mockGen(){ return mockQuestions({n:mockCfg.n, types:mockCfg.types, topics:mockCfg.topic === "all" ? [] : [mockCfg.topic]}); }
@@ -128,12 +175,12 @@ function renderMockSetup(){
 
 /* ================================================================ wiring */
 var engines = {};
-renderGuide(); renderKit();
+renderGuide(); renderKit(); renderPrep();
 
 var ON_SHOW = {"exam/mock":function(){ if(!engines.mock) renderMockSetup(); }};
 var KEYS = {"exam/mock":function(e){ return engines.mock ? engines.mock.keys(e) : false; }};
-var TOPICS = ["guide","exam","kit"];
-var currentTopic = "guide", currentMode = {guide:"overview", kit:"card", exam:"mock"};
+var TOPICS = ["guide","exam","prep","kit"];
+var currentTopic = "guide", currentMode = {guide:"overview", kit:"card", exam:"mock", prep:"run"};
 function showMode(topic, mode){
   currentMode[topic] = mode;
   $$('.seg[data-modes="'+topic+'"] button').forEach(function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-mode") === mode)); });

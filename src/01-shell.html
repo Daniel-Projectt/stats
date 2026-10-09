@@ -11,6 +11,7 @@
   <nav class="topics" role="tablist" aria-label="Sections">
     <button class="topic-btn" role="tab" data-topic="guide" aria-selected="true">Objectives</button>
     <button class="topic-btn" role="tab" data-topic="exam" aria-selected="false">Practice</button>
+    <button class="topic-btn" role="tab" data-topic="prep" aria-selected="false">Exam Prep</button>
     <button class="topic-btn" role="tab" data-topic="kit" aria-selected="false">Exam Kit</button>
   </nav>
 
@@ -33,6 +34,12 @@
       <div class="panel" data-panel="kit/card"><div id="kitCard"></div></div>
       <div class="panel" data-panel="kit/tools" hidden><div id="kitTools"></div></div>
       <div class="panel" data-panel="kit/which" hidden><div id="kitWhich"></div></div>
+    </section>
+
+    <!-- ================= EXAM PREP ================= -->
+    <section class="topic" id="topic-prep" hidden>
+      <p class="intro">A practice exam with one question for every objective, with numbers you haven&rsquo;t seen. Work each part on paper first, then tap to check yourself.</p>
+      <div class="panel" data-panel="prep/run"><div id="prepRoot"></div></div>
     </section>
 
     <!-- ================= PRACTICE EXAM ================= -->
