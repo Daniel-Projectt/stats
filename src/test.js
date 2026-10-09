@@ -239,6 +239,32 @@ head('the professor’s practice quiz, chapter 4');
   for (let r = 0; r < 10; r++) { const q = A.realQuiz(4, true); ok(q.length === 7 && q.every(x => /You missed/.test(x.explain)), 'the misses-only run is those seven'); }
   for (let r = 0; r < 20; r++) { const q = A.realQuiz(4); ok(q.length === 18 && new Set(q.map(x => x.key)).size === 18 && q.every(x => x.opts.length === 4 && x.opts.filter(o => o.ok).length === 1), 'the quiz runs all eighteen, one right answer each'); }
 }
+head('the professor’s practice quiz, chapter 5');
+{
+  const R5 = A.QB.filter(q => q.real === 5), ra = re => R5.find(q => re.test(q.q)).a;
+  const f5 = n => n < 2 ? 1 : n * f5(n - 1), b5 = (x, n, p) => f5(n) / (f5(x) * f5(n - x)) * Math.pow(p, x) * Math.pow(1 - p, n - x);
+  ok(R5.length === 14 && R5.every(q => q.tp === 'c5' && q.t === 'mc' && q.w.length === 3 && q.e.length > 30 && /^g5\d-\d$/.test(q.sec) && !q.w.includes(q.a)), 'fourteen of his questions, each tied to a chapter 5 objective');
+  ok(ra(/0\.50, 0\.65, and −0\.15/).startsWith('The table is invalid because every individual probability'), 'Q1');
+  ok(Math.abs(0 * 0.2 + 1 * 0.5 + 3 * 0.3 - 1.4) < 1e-12 && ra(/zero emergency appointments/).startsWith('The expected count is 1.4'), 'Q2: 1.4');
+  ok(ra(/until making a third sale/).startsWith('The stopping rule'), 'Q3');
+  ok(ra(/observation interval doubles/).startsWith('The mean and variance double'), 'Q4');
+  ok(ra(/at least three successes/) === '1 − F(2)', 'Q5');
+  ok(ra(/possible Poisson random variable/).startsWith('The number of individual customers'), 'Q6');
+  ok(25 * 0.2 === 5 && Math.sqrt(25 * 0.2 * 0.8) === 2 && ra(/25 comparable prospects/) === 'Mean 5 and standard deviation 2.', 'Q7: mean 5, sd 2');
+  ok(3 * 20 / 60 === 1 && ra(/three support requests per hour/) === 'POISSON.DIST(2, 1, FALSE)', 'Q8: mean 1 for 20 minutes');
+  ok(ra(/cash, card, or a digital wallet/).startsWith('The number paid in cash'), 'Q9');
+  ok(ra(/Exact weight of quarters/) === 'B; A; C', 'Q10');
+  ok(39000 * 0.7 - 8000 * 0.3 === 24900 && ra(/contractor/) === '$24,900', 'Q11: $24,900');
+  ok(ra(/roulette wheel 7 times/).startsWith('Not binomial: there are more than two outcomes'), 'Q12');
+  const pass = [6, 7, 8, 9, 10].reduce((s, x) => s + b5(x, 10, 0.5), 0);
+  ok(pass.toFixed(3) === ra(/10 true\/false questions/) && b5(6, 10, 0.5).toFixed(3) === '0.205', 'Q13: 0.377 (0.205 is exactly six)');
+  ok(Math.exp(-19.2 / 24).toFixed(5) === ra(/car towing service/), 'Q14: e to the −0.8');
+  const m5 = R5.filter(q => q.miss);
+  ok(m5.length === 6 && m5.every(q => /^You missed this on the practice quiz\. /.test(q.e)) && ['interval doubles', 'possible Poisson random variable', 'three support requests', 'contractor', '10 true/false', 'car towing'].every(k => m5.some(q => q.q.includes(k))), 'his six misses (questions 4, 6, 8, 11, 13, 14) are marked');
+  ok(Math.abs(Math.exp(-1) / 2 - 0.1839) < 5e-5 && /about 0\.1839/.test(R5.find(q => /three support requests/.test(q.q)).e), 'the professor’s 0.1839 checks out');
+  for (let r = 0; r < 10; r++) ok(A.realQuiz(5, true).length === 6, 'the misses-only run is those six');
+  for (let r = 0; r < 10; r++) { const q = A.realQuiz(5); ok(q.length === 14 && q.every(x => x.opts.filter(o => o.ok).length === 1), 'the chapter 5 quiz runs all fourteen'); }
+}
 head('exam prep');
 {
   const P = A.PREP, xs = s => String(s).replace(/<[^>]+>/g, ''), ans = (q, p) => xs(P[q - 1].parts[p][1]);

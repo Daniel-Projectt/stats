@@ -128,6 +128,11 @@ click(realRes.querySelector('.setupbtn'));
 click($('#mxReal4m')); ok($$('#mockExam .dots i').length === 7, 'Only the 7 I missed runs seven questions', $$('#mockExam .dots i').length);
 const missRes = answerQuiz($('#mockExam'), 'his misses'); click(missRes.querySelector('.setupbtn'));
 
+click($('#mxReal5')); ok($$('#mockExam .dots i').length === 14, 'his Chapter 5 quiz: fourteen questions', $$('#mockExam .dots i').length);
+const r5Res = answerQuiz($('#mockExam'), 'his chapter 5 quiz'); click(r5Res.querySelector('.setupbtn'));
+click($('#mxReal5m')); ok($$('#mockExam .dots i').length === 6, 'Only the 6 I missed runs six questions');
+const m5Res = answerQuiz($('#mockExam'), 'his chapter 5 misses'); click(m5Res.querySelector('.setupbtn'));
+
 head('exam prep');
 w.localStorage.removeItem('stats.prep');
 topic('guide'); topic('prep');
