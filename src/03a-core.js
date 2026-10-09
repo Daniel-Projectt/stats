@@ -29,10 +29,10 @@ var VERDICTS = [
    t:["Strong.","Very well done.","Nearly perfect.","Excellent work."]},
   {min:70,  a:"A solid base, with a few real gaps. Work the misses, then take it again.",
    t:["Good work.","A solid pass.","Coming along nicely.","Well on your way."]},
-  {min:50,  a:"About half. A pass through the notes and flashcards for this chapter before testing again will lift this quickly.",
+  {min:50,  a:"About half. Work the misses below in Fix My Misses, then run it again.",
    t:["Halfway there.","A fair start.","Keep going.","Room to grow."]},
-  {min:0,   a:"It is easier to test once the material is in place \u2014 start with the notes and flashcards, then come back.",
-   t:["A first pass.","Early days.","Not yet \u2014 and that\u2019s all right.","Begin with the notes."]}
+  {min:0,   a:"It is easier to test once the material is in place \u2014 open the Objectives and the cheat sheet first, then come back.",
+   t:["A first pass.","Early days.","Not yet \u2014 and that\u2019s all right.","Begin with the Objectives."]}
 ];
 function verdictFor(p){
   for(var i=0;i<VERDICTS.length;i++){ if(p >= VERDICTS[i].min){ var v = VERDICTS[i]; return {t:pick(v.t,1)[0], a:v.a}; } }
@@ -148,7 +148,7 @@ function questionsByKeys(keys){
    types  — all / mc / tf / ap
                                                                               */
 /* the professor's own practice quiz for one chapter: every one of his questions, reshuffled */
-function realQuiz(n, missOnly){ var out = []; QB.forEach(function(b, i){ if(b.real && (!n || b.real === n) && (!missOnly || b.miss)) out.push(fromBank(b, i)); }); return shuffle(out); }
+function realQuiz(n, missOnly){ var out = []; QB.forEach(function(b, i){ if(b.real && (!n || b.real === n) && (!missOnly || (missOnly === "again" ? b.again : b.miss))) out.push(fromBank(b, i)); }); return shuffle(out); }
 function mockQuestions(cfg){
   var tps = cfg.topics && cfg.topics.length ? cfg.topics : CHAPTERS.slice();
   var n = cfg.n || 25;

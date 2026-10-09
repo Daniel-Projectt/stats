@@ -135,6 +135,8 @@ ok($$('#mockExam .dots i').length === 18, 'eighteen questions', $$('#mockExam .d
 const realRes = answerQuiz($('#mockExam'), 'his quiz');
 ok(realRes && /\/18/.test(realRes.querySelector('.big').textContent), 'scored out of 18');
 click(realRes.querySelector('.setupbtn'));
+click($('#mxRealAgain')); ok($$('#mockExam .dots i').length === 17, 'Only the 17 I missed last time runs seventeen', $$('#mockExam .dots i').length);
+const agRes = answerQuiz($('#mockExam'), 'the seventeen'); click(agRes.querySelector('.setupbtn'));
 click($('#mxReal4m')); ok($$('#mockExam .dots i').length === 7, 'Only the 7 I missed runs seven questions', $$('#mockExam .dots i').length);
 const missRes = answerQuiz($('#mockExam'), 'his misses'); click(missRes.querySelector('.setupbtn'));
 
@@ -150,8 +152,8 @@ head('fix my misses');
 w.localStorage.removeItem('stats.fix');
 topic('guide'); click($('#gFix'));
 const fx = () => $('#fixRoot');
-ok(visible(fx()) && fx().querySelectorAll('.fixcard').length === 10 && /Fixed 0 of 10/.test(fx().textContent), 'ten skills, none fixed yet');
-ok(fx().querySelectorAll('.fixrule').length === 10 && !fx().querySelector('.fixq'), 'each shows its rule; no problem open');
+ok(visible(fx()) && fx().querySelectorAll('.fixcard').length === 13 && /Fixed 0 of 13/.test(fx().textContent), 'thirteen skills, none fixed yet');
+ok(fx().querySelectorAll('.fixrule').length === 13 && !fx().querySelector('.fixq'), 'each shows its rule; no problem open');
 const card = id => fx().querySelector('.fixcard[data-fix="' + id + '"]');
 const answer = (id, right) => { const os = Array.from(card(id).querySelectorAll('[data-fo]')); click(os.find(o => /* pick by trying */ true && false) || os[0]); };
 // answer a problem correctly by trying: click a choice, read whether it was right
@@ -168,14 +170,14 @@ function solve(id, wantRight) {
   ok(gotRight ? after === Math.min(3, before + 1) : after === 0, id + ': a right answer adds to the streak, a miss resets it', before + ' -> ' + after + ' right=' + gotRight);
   return gotRight;
 }
-['bayes', 'rescale', 'ev', 'atleast', 'count'].forEach(id => { for (let i = 0; i < 6; i++) solve(id); });
+['bayes', 'rescale', 'ev', 'atleast', 'count', 'semean', 'se', 'unbiased'].forEach(id => { for (let i = 0; i < 6; i++) solve(id); });
 ok(/"bayes":\d/.test(w.localStorage.getItem('stats.fix') || ''), 'the streaks are saved');
 // force one skill to three in a row through the saved state, then check the page reflects it
 w.localStorage.setItem('stats.fix', JSON.stringify({ neither: 3, or: 2 }));
 topic('guide'); topic('fix'); click($('#fixReset')); w.localStorage.setItem('stats.fix', JSON.stringify({ neither: 3, or: 2 })); topic('guide'); click($('#gFix'));
 click(card('or').querySelector('[data-fstart]')); click(card('or').querySelector('[data-fclose]') || card('or').querySelectorAll('[data-fo]')[0]);
-ok(card('neither').classList.contains('ok') && /Fixed 1 of 10/.test(fx().textContent) && card('neither').querySelectorAll('.fixpips i.on').length === 3, 'three in a row marks a skill fixed');
-click($('#fixReset')); ok(/Fixed 0 of 10/.test(fx().textContent) && w.localStorage.getItem('stats.fix') === '{}', 'Start all ten over clears it');
+ok(card('neither').classList.contains('ok') && /Fixed [12] of 13/.test(fx().textContent) && card('neither').querySelectorAll('.fixpips i.on').length === 3, 'three in a row marks a skill fixed');
+click($('#fixReset')); ok(/Fixed 0 of 13/.test(fx().textContent) && w.localStorage.getItem('stats.fix') === '{}', 'Start all ten over clears it');
 
 head('exam prep');
 w.localStorage.removeItem('stats.prep');

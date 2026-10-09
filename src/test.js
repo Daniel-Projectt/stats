@@ -213,7 +213,7 @@ ok((html.match(/class="topic-btn"/g) || []).length === 5, 'five tabs: objectives
 head('fix my misses');
 {
   const F = A.FIX, xs = s => String(s).replace(/<[^>]+>/g, ''), fa = n => n < 2 ? 1 : n * fa(n - 1);
-  ok(F.length === 10 && F.map(k => k.id).join() === 'bayes,neither,or,none,count,rescale,scale,poisson,ev,atleast' && F.every(k => k.t && k.rule.length > 40 && /Chapter [45] quiz, question/.test(k.from)), 'ten skills, each with a rule and the quiz question it comes from');
+  ok(F.length === 13 && F.map(k => k.id).join() === 'bayes,neither,or,none,count,rescale,scale,poisson,ev,atleast,semean,se,unbiased' && F.every(k => k.t && k.rule.length > 40 && /Chapter [456] quiz, question/.test(k.from)), 'thirteen skills, each with a rule and the quiz question it comes from');
   const money = x => (x < 0 ? '−$' : '$') + Math.abs(Math.round(x)).toLocaleString('en-US'), int = x => Math.round(x).toLocaleString('en-US');
   const want = {
     bayes: v => (v.a * v.r1 / (v.a * v.r1 + (1 - v.a) * v.r2)).toFixed(3),
@@ -225,7 +225,10 @@ head('fix my misses');
     scale: v => 'Mean × ' + v.k + ', variance × ' + v.k + ', standard deviation × ' + (v.k === 4 ? '2' : v.k === 9 ? '3' : '√' + v.k),
     poisson: v => v.right,
     ev: v => money(v.p * v.A - (1 - v.p) * v.B),
-    atleast: v => '1 − BINOM.DIST(' + ((v.more ? v.k + 1 : v.k) - 1) + ', ' + v.n + ', ' + v.p + ', TRUE)'
+    atleast: v => '1 − BINOM.DIST(' + ((v.more ? v.k + 1 : v.k) - 1) + ', ' + v.n + ', ' + v.p + ', TRUE)',
+    semean: v => (v.above ? '1 − ' : '') + 'NORM.DIST(' + v.x + ', ' + v.mu + ', ' + (v.sd / Math.sqrt(v.n)) + ', TRUE)',
+    se: v => v.kind === 'times' ? 'It is divided by ' + Math.sqrt(v.k) + ', because standard error is sd ÷ √n' : v.kind === 'center' ? '$' + v.m : (v.sd / Math.sqrt(v.n)).toFixed(2),
+    unbiased: v => v.right
   };
   F.forEach(k => {
     const texts = new Set();
@@ -234,7 +237,7 @@ head('fix my misses');
       texts.add(q.text + '|' + right[0].html);
       ok(q.opts.length === 4 && right.length === 1 && new Set(all).size === 4, k.id + ': four distinct choices, one right', all.join(' | '));
       ok(right[0].html === want[k.id](q.vals), k.id + ': the right answer recomputed', right[0].html + ' vs ' + want[k.id](q.vals) + ' :: ' + JSON.stringify(q.vals));
-      ok(q.text.length > 40 && xs(q.explain).length > 60 && (k.id === 'scale' || xs(q.explain).includes(xs(right[0].html))), k.id + ': the explanation shows the answer', xs(q.explain));
+      ok(q.text.length > 40 && xs(q.explain).length > 60 && (k.id === 'scale' || k.id === 'se' || xs(q.explain).includes(xs(right[0].html))), k.id + ': the explanation shows the answer', xs(q.explain));
       if (k.id === 'neither') ok(Math.abs(q.vals.p1 + q.vals.p2 - 1) > 1e-9, 'neither: both and neither are never the same number');
       ok(all.every(x => !/NaN|undefined|Infinity/.test(x)) && !/NaN|undefined/.test(q.text + q.explain), k.id + ': no broken numbers');
       if (['bayes', 'neither', 'or', 'none'].includes(k.id)) ok(all.every(x => +x >= 0 && +x <= 1), k.id + ': every choice is a possible probability', all.join(' | '));
@@ -328,6 +331,20 @@ head('the professor’s practice quiz, chapter 6');
   ok(14 / Math.sqrt(49) === 2 && Math.abs((109.8 - 107) / 2 - 1.4) < 1e-9 && (1 - Ph(1.4)).toFixed(4) === ra(/snowfall/), 'Q16: 0.0808');
   for (let r = 0; r < 10; r++) { const q = A.realQuiz(6); ok(q.length === 16 && q.every(x => x.opts.filter(o => o.ok).length === 1), 'the chapter 6 quiz runs all sixteen'); }
 }
+head('his run of all 48: thirty-one right, seventeen to redo');
+{
+  const ag = A.QB.filter(q => q.again);
+  ok(ag.length === 17 && ag.every(q => q.real) && 48 - 17 === 31, 'seventeen flagged from the run he pasted');
+  ok(ag.filter(q => q.real === 4).length === 7 && ag.filter(q => q.real === 5).length === 5 && ag.filter(q => q.real === 6).length === 5, 'seven from chapter 4, five from chapter 5, five from chapter 6');
+  ok(ag.filter(q => q.miss).length === 10, 'ten of them he had already missed the first time');
+  ok(ag.filter(q => /^g64-/.test(q.sec)).length === 4 && ag.filter(q => /^g43-[34]/.test(q.sec)).length === 3 && ag.filter(q => /^g53-[23]/.test(q.sec)).length === 3, 'the clusters: four on sample means, three on Bayes, three on Poisson');
+  for (let r = 0; r < 10; r++) ok(A.realQuiz(0, 'again').length === 17, 'the redo run is those seventeen');
+  ok(!/notes and flashcards|Begin with the notes/.test(src), 'the advice after a quiz no longer points at notes and flashcards that are gone');
+  // the three chapter 6 skills, checked against his real questions
+  const sm = A.FIX.find(k => k.id === 'semean');
+  for (let r = 0; r < 200; r++) { const q = sm.gen(), v = q.vals; ok(Number.isInteger(v.sd / Math.sqrt(v.n) * 2) && q.opts.some(o => o.html.includes(', ' + v.sd + ', TRUE')) && q.opts.some(o => o.html.includes(v.sd + '/' + v.n)), 'sample-mean problems offer the plain-sd and the sd/n mistakes'); }
+  ok(12 / Math.sqrt(36) === 2 && 14 / Math.sqrt(49) === 2, 'his two real questions both have a standard error of 2');
+}
 head('all of the professor’s questions together');
 {
   const all = A.QB.filter(q => q.real);
@@ -335,6 +352,17 @@ head('all of the professor’s questions together');
   ok(new Set(all.map(q => q.q)).size === 48, 'no real question appears twice');
   for (let r = 0; r < 10; r++) { const q = A.realQuiz(0); ok(q.length === 48 && new Set(q.map(x => x.key)).size === 48 && new Set(q.map(x => x.tp)).size === 3, 'the all-48 run has every one, from all three chapters'); }
   ok(/id="mxRealAll"/.test(src) && src.indexOf('id="mxRealAll"') < src.indexOf('id="mxReal4"') && src.indexOf('id="mxReal4"') < src.indexOf('id="mxFifty"'), 'in Practice his questions come first, the all-48 button at the very top');
+}
+head('his help card');
+{
+  const card = A.KIT.card, all = card.front.concat(card.back), txt = all.map(r => r[0] + ' ' + r[1]).join(' | ');
+  ok(card.front.length === 11 && card.back.length === 12 && all.every(r => r[0] && r[1].length > 5), 'a two-sided card: eleven lines and twelve lines');
+  ['count the overlap ONCE', 'multiply the MISSES', 'top AND bottom drop by 1', 'THAT GROUP only', 'other share × other rate', 'COMBIN', 'PERMUT', 'a LOSS is NEGATIVE', '1 − F(k−1)', 'CONVERT THE RATE FIRST', 'sd × √k',
+   'NORM.INV(1 − X', 'σ ÷ √n', 'NOT σ ÷ n', 'standard error ÷ 2', 'mean, proportion, variance', 'Essay 17', 'Essay 18'].forEach(k => ok(txt.includes(k), 'help card has: ' + k));
+  // every line answers something he actually missed
+  const missedSecs = new Set(A.QB.filter(q => q.again || q.miss).map(q => q.sec));
+  ok(['g42-1', 'g42-2', 'g43-3', 'g43-4', 'g44-2', 'g51-4', 'g52-2', 'g53-2', 'g53-3', 'g63-2', 'g64-2', 'g64-3'].every(s => missedSecs.has(s)), 'the card covers the objectives he missed', [...missedSecs].join());
+  ok(txt.length < 1900, 'short enough to copy onto one card by hand', txt.length);
 }
 head('the cheat sheet');
 {

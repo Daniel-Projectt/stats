@@ -314,3 +314,6 @@ details.work summary{font-size:12px}
   body.printcheat .tbl.cheatt td{font-size:10.5px;padding:3px 5px;line-height:1.3}
   body.printcheat .cheat .point,body.printcheat .cheat h3{margin:6px 0 3px}
 }
+
+.fifty .lastrun{font-family:var(--sans);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.fifty .btn + .lastrun{display:block}

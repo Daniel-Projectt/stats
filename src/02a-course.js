@@ -120,27 +120,34 @@ var GUIDE = {sections:[
 /* ================================================================ the exam kit
    What he may bring (one flashcard) and use (two tools), turned into something to act on. */
 var KIT = {
+ /* his own help card, rebuilt 9-oct from what he missed: the first attempt at the professor's Chapter 4 and 5
+    quizzes and his run of all 48 (31 right). Each line is a miss of his turned into the rule that fixes it. */
  card:{
   front:[
-   ["Addition", "P(A or B) = P(A) + P(B) − P(A and B)"],
-   ["Multiplication", "P(A and B) = P(A) × P(B | A)"],
-   ["Complement", "P(at least one) = 1 − P(none)"],
-   ["Conditional", "P(A | B) = P(A and B) ÷ P(B)   (cell ÷ B’s total)"],
-   ["Bayes", "10,000 table → flagged-and-true ÷ all flagged"],
-   ["Counting", "order matters: nPr = n!/(n−r)!     no order: nCr = n!/[r!(n−r)!]"],
-   ["Any discrete", "μ = Σ x·P(x)     σ = √(Σ x²·P(x) − μ²)"],
-   ["Binomial", "μ = np     σ = √(npq)     needs: fixed n, independent, 2 outcomes, same p"],
-   ["Poisson", "σ = √μ     rescale μ to the interval asked"]],
+   ["“or”", "P(A) + P(B) − P(both)     count the overlap ONCE"],
+   ["“neither”", "(1 − p₁) × (1 − p₂)     multiply the MISSES, not the hits"],
+   ["“none”, no replacement", "good/total × (good−1)/(total−1) × …     top AND bottom drop by 1"],
+   ["“given”", "divide by THAT GROUP only, not by everyone"],
+   ["Bayes = the pile", "(share × rate) ÷ [(share × rate) + (other share × other rate)]     rare → most positives are false alarms"],
+   ["Counting", "group / committee → COMBIN (smaller)     roles / titles → PERMUT"],
+   ["Expected value", "Σ x·P(x)     a LOSS is NEGATIVE     answer must be below the win-only number"],
+   ["Binomial", "mean = np     sd = √(np(1−p))     needs: fixed n, independent, 2 outcomes, same p"],
+   ["At least / more than", "at least k = 1 − F(k−1)     more than k = 1 − F(k)     fewer than k = F(k−1)"],
+   ["Poisson", "CONVERT THE RATE FIRST (per day → per hour)     POISSON.DIST(x, mean, FALSE)     variance = mean"],
+   ["Interval × k", "mean × k     variance × k     sd × √k"]],
   back:[
-   ["z-score", "z = (x − μ) ÷ σ          cutoff: x = μ + z·σ"],
-   ["Sample mean", "use σ ÷ √n  (standard error), not σ"],
-   ["Significant", "high: μ + 2σ or more     low: μ − 2σ or less     or P(that or more extreme) ≤ 0.05"],
-   ["Excel: binomial", "=BINOM.DIST(x, n, p, FALSE exact / TRUE ≤ x)"],
-   ["Excel: Poisson", "=POISSON.DIST(x, μ, FALSE / TRUE)"],
-   ["Excel: normal", "=NORM.DIST(x, μ, σ, TRUE) left area    =NORM.INV(area left, μ, σ)"],
-   ["Phrases", "at most 3 → ≤ 3     fewer than 3 → ≤ 2     at least 4 → 1 − (≤ 3)     more than 3 → 1 − (≤ 3)"],
-   ["Percentile", "always the area to the LEFT (top 10% = 0.90)"],
-   ["z to know", "90% → 1.282 · 95% → 1.645     97.5% → 1.960 · 99% → 2.326"]]
+   ["z and cutoff", "z = (x − μ) ÷ σ          x = μ + z·σ"],
+   ["Normal in Excel", "less than: NORM.DIST(x, μ, σ, TRUE)     greater: 1 − that     between: upper − lower"],
+   ["Top X% cutoff", "NORM.INV(1 − X, μ, σ)     bottom X%: NORM.INV(X, μ, σ)"],
+   ["ONE person", "use σ as it is     do NOT divide"],
+   ["MEAN of n", "use σ ÷ √n     NOT σ, NOT σ ÷ n"],
+   ["Sample means", "center = μ, unchanged     4 × the sample → standard error ÷ 2"],
+   ["Central limit", "the MEANS go normal (population normal, or n > 30)     individuals do not"],
+   ["Unbiased", "mean, proportion, variance     biased: median, range, sd"],
+   ["Looks normal?", "bell histogram + straight quantile plot     graphs never prove it"],
+   ["Essay 17", "calculation, units matched → compare the two, what it means → one assumption, how it fails, why it matters"],
+   ["Essay 18", "center = μ → shape normal + why, random and independent → individuals keep σ, means have σ ÷ √n"],
+   ["Wrong-answer words", "always · never · must · guarantees · proves · automatically"]]
  },
  tools:[
   {name:"Normal Distribution Explorer", url:"https://tools.benhartlage.com/normal-area/",

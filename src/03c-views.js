@@ -212,7 +212,7 @@ function renderKit(){
   }
   $("#kitCard").innerHTML =
     '<div class="note-sec"><div class="point"><b>The point</b><p>You may bring <mark>one flashcard</mark>. Spend it on what is easy to forget under pressure: the formulas, the Excel functions and the phrases that change an endpoint. Copy it by hand; writing it is half the studying.</p><p class="able"><b>Before the exam</b>cover it and see how much you can already write from memory. What you can, leave off and use the space for what you cannot.</p></div></div>'+
-    '<div class="fcwrap">'+side("Front · probability and discrete distributions", KIT.card.front)+side("Back · normal, sampling and Excel", KIT.card.back)+'</div>'+
+    '<div class="fcwrap">'+side("Front · Chapters 4 and 5", KIT.card.front)+side("Back · Chapter 6 and the essays", KIT.card.back)+'</div>'+
     '<div class="toolbar" style="justify-content:center;margin-top:18px"><button class="btn" type="button" id="kitPrint">Print this card</button></div>';
   $("#kitPrint").addEventListener("click", function(){ document.body.classList.add("printkit"); window.print(); setTimeout(function(){ document.body.classList.remove("printkit"); }, 800); });
   $("#kitTools").innerHTML = KIT.tools.map(function(t){
@@ -244,7 +244,8 @@ function renderMockSetup(){
   root.innerHTML = '<div class="quizWrap"><div class="qcard card-corners">'+CORNERS+
     '<div class="qnum">Practice exam</div><p class="qtext">Set it up, then answer across the chapters. Each run is drawn fresh.</p>'+
     '<div class="fifty realall"><button class="btn primary" type="button" id="mxRealAll">All 48 of the professor&rsquo;s questions</button>'+
-      '<p><b>Start here.</b> He said the exact exam questions are all in his practice quizzes. These are those three quizzes together, word for word, with his explanations, in a new order each time.</p></div>'+
+      '<p><b>Start here.</b> He said the exact exam questions are all in his practice quizzes. These are those three quizzes together, word for word, with his explanations, in a new order each time.</p>'+
+      '<button class="btn" type="button" id="mxRealAgain">Only the 17 I missed last time</button><p class="lastrun">Your last full run: 31 of 48.</p></div>'+
     '<div class="fifty"><button class="btn primary" type="button" id="mxReal4">The professor&rsquo;s practice quiz &mdash; Chapter 4</button>'+
       '<p>His own 18 questions from Canvas, word for word, with his explanations, in a new order each time. You scored 11 of 18 the first time.</p>'+
       '<button class="btn" type="button" id="mxReal4m">Only the 7 I missed</button></div>'+
@@ -268,6 +269,10 @@ function renderMockSetup(){
   $("#mxStart").addEventListener("click", function(){ startMock(null); });
   $("#mxFifty").addEventListener("click", startFifty);
   $("#mxRealAll").addEventListener("click", startRealAll);
+  $("#mxRealAgain").addEventListener("click", function(){
+    engines.mock = makeQuiz($("#mockExam"), function(){ return realQuiz(0, "again"); }, {showTopic:true, againLabel:"Again, reshuffled", onSetup:renderMockSetup});
+    engines.mock.start(null);
+  });
   $("#mxReal6").addEventListener("click", function(){
     engines.mock = makeQuiz($("#mockExam"), function(){ return realQuiz(6); }, {showTopic:true, againLabel:"Again, reshuffled", onSetup:renderMockSetup});
     engines.mock.start(null);

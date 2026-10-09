@@ -114,5 +114,45 @@ var FIX = [
     return {vals:{n:n, p:p, k:k, more:more}, text:"n = "+n+" trials, p = "+p+". Which Excel expression gives the probability of "+(more ? "more than "+k : "at least "+k)+" successes?",
       opts:fxOpts(E(start - 1, "TRUE", true), [E(start, "TRUE", true), E(start - 1, "TRUE", false), E(k, "FALSE", false)], [E(start - 2, "TRUE", true), E(start, "TRUE", false)]),
       explain:(more ? "More than "+k : "At least "+k)+" starts at "+start+" and counts up. One minus everything below it, 0 through "+(start - 1)+": <b>"+E(start - 1, "TRUE", true)+"</b>. Typing "+start+" instead would also throw away "+start+" itself."};
+  }},
+ {id:"semean", t:"A sample mean: divide by √n first", from:"Chapter 6 quiz, questions 8 and 16",
+  rule:"“The mean of n…” uses the standard error, sd ÷ √n. Then “exceeds” needs 1 − in front.",
+  gen:function(){
+    var c = pick([[30, 12, 36], [107, 14, 49], [50, 10, 25], [200, 40, 16], [80, 24, 64], [40, 8, 16]], 1)[0], mu = c[0], sd = c[1], n = c[2], se = sd / Math.sqrt(n);
+    var z = pick([1, 1.5, 2], 1)[0], x = mu + z * se, above = Math.random() < 0.65;
+    var E = function(s, one){ return (one ? "1 − " : "")+"NORM.DIST("+x+", "+mu+", "+s+", TRUE)"; };
+    return {vals:{mu:mu, sd:sd, n:n, x:x, above:above}, text:"Values come from a normal population with mean "+mu+" and standard deviation "+sd+". A sample mean summarizes "+n+" independent values. Which expression gives the chance that the sample mean "+(above ? "exceeds " : "is less than ")+x+"?",
+      opts:fxOpts(E(se, above), [E(sd, above), E(sd+"/"+n, above), E(se, !above)], [E(sd, !above)]),
+      explain:"It is a mean of "+n+", so the spread is "+sd+" ÷ √"+n+" = <b>"+se+"</b>, not "+sd+" and not "+sd+"/"+n+". "+(above ? "“Exceeds” is the right tail, so it needs 1 − in front" : "“Less than” is the left area, so no 1 −")+": <b>"+E(se, above)+"</b>."};
+  }},
+ {id:"se", t:"Standard error: center and spread", from:"Chapter 6 quiz, questions 3 and 9",
+  rule:"Sample means center on the population mean, unchanged. Their spread is sd ÷ √n, so k times the sample divides it by √k.",
+  gen:function(){
+    var kind = pick(["times", "center", "value"], 1)[0], k, n, sd, m;
+    if(kind === "times"){
+      k = pick([4, 9, 16, 25], 1)[0];
+      return {vals:{kind:kind, k:k}, text:"Two studies sample from the same population. Study B has "+k+" times as many observations per sample as Study A. What happens to the standard error of the sample mean?",
+        opts:fxOpts("It is divided by "+Math.sqrt(k)+", because standard error is sd ÷ √n", ["It is divided by "+k+", because standard error is sd ÷ n", "It becomes zero, because a larger sample removes sampling variation", "The population standard deviation is divided by "+Math.sqrt(k)]),
+        explain:"√"+k+" = "+Math.sqrt(k)+", so the standard error is <b>divided by "+Math.sqrt(k)+"</b>. Dividing by "+k+" forgets the square root, and the population itself does not change."};
+    }
+    if(kind === "center"){
+      m = pick([80, 120, 45, 250], 1)[0]; n = pick([25, 36, 40, 50], 1)[0];
+      return {vals:{kind:kind, m:m, n:n}, text:"The population mean of a daily invoice is $"+m+". Each day an auditor takes a fresh random sample of "+n+" invoices and computes its mean. What is the mean of the sampling distribution of these sample means?",
+        opts:fxOpts("$"+m, [fxMoney(m / n), fxMoney(m * n), "It cannot be identified unless the population is normal"]),
+        explain:"Sample means center on the population mean: <b>$"+m+"</b>. The sample size changes their spread, not their center. "+fxMoney(m * n)+" would be a total; normality is about shape."};
+    }
+    sd = pick([12, 20, 15, 30], 1)[0]; n = pick([16, 25, 36, 100], 1)[0];
+    return {vals:{kind:kind, sd:sd, n:n}, text:"A population has standard deviation "+sd+". What is the standard error of the mean for samples of "+n+"?",
+      opts:fxOpts(fxNum(sd / Math.sqrt(n), 2), [fxNum(sd / n, 2), fxNum(sd, 2), fxNum(sd * Math.sqrt(n), 2)]),
+      explain:"The standard error is the standard deviation divided by √n: "+sd+" ÷ √"+n+" = "+sd+" ÷ "+Math.sqrt(n)+" = <b>"+fxNum(sd / Math.sqrt(n), 2)+"</b>. "+fxNum(sd / n, 2)+" divides by n instead of √n."};
+  }},
+ {id:"unbiased", t:"Biased or unbiased?", from:"Chapter 6 quiz, question 12, and your homework",
+  rule:"Unbiased: mean, proportion, variance. Biased: median, range, standard deviation.",
+  gen:function(){
+    var good = ["Sample mean", "Sample proportion", "Sample variance"], bad = ["Sample median", "Sample range", "Sample standard deviation"], wantGood = Math.random() < 0.6;
+    var right = pick(wantGood ? good : bad, 1)[0];
+    return {vals:{right:right, wantGood:wantGood}, text:"Which of these statistics is "+(wantGood ? "an <b>unbiased</b>" : "a <b>biased</b>")+" estimator of its population parameter?",
+      opts:fxOpts(right, wantGood ? bad : good),
+      explain:"<b>"+right+"</b>. Unbiased means its values center on the true population value across many samples: that holds for the mean, the proportion and the variance, and fails for the median, the range and the standard deviation."};
   }}
 ];
