@@ -355,8 +355,14 @@ head('all of the professor’s questions together');
 }
 head('his help card');
 {
-  const card = A.KIT.card, all = card.front.concat(card.back), heads = all.filter(r => r.length === 1).map(r => r[0]), rows = all.filter(r => r.length === 2), txt = all.join(' | ');
-  ok(heads.length === 7 && rows.length === 39 && rows.every(r => r[0] && r[1].length > 8), 'divided into seven kinds of problem, thirty-nine questions', heads.length + '/' + rows.length);
+  const card = A.KIT.card, all = card.front.concat(card.back).concat(card.extra), heads = all.filter(r => r.length === 1).map(r => r[0]), rows = all.filter(r => r.length === 2), txt = all.join(' | ');
+  ok(heads.length === 12 && rows.length === 62 && rows.every(r => r[0] && r[1].length > 8), 'seven kinds of problem plus five extra blocks', heads.length + '/' + rows.length);
+  { const ex = card.extra.map(r => r.join(' ')).join(' | '), near2 = (a, b) => Math.abs(a - b) < 1e-9;
+    ok(card.extra.filter(r => r.length === 1).length === 5 && card.extra.filter(r => /^[1-5] · /.test(r[0])).length === 10, 'the extra block: five headings, each essay in five sentences');
+    ['Poisson', 'independent and the rate is steady', 'because the sample mean is unbiased', 'over 30', 'random and the observations independent', 'bell-shaped and narrower', 'mutually exclusive', 'the AREA', '0.012 ÷ 0.019 = 0.63', 'add: 24,900'].forEach(k => ok(ex.includes(k), 'extra has: ' + k));
+    ok(near2(0.30 * 0.04, 0.012) && near2(0.70 * 0.01, 0.007) && Math.round(0.012 / 0.019 * 100) === 63 && near2(0.30 * 90000 - 0.70 * 3000, 24900), 'both worked examples add up');
+    // each essay sentence answers a row of the professor's rubric
+    ok(A.ESSAYS.length === 2 && A.ESSAYS.every(e => e.rows.length === 3 && e.steps.length === 5), 'the essays still have three rubric rows and five steps each'); }
   ok(card.front[0].length === 1 && card.back[0].length === 1, 'each side opens with a heading');
   ['Plain probability', 'A table of values', 'Binomial', 'Poisson', 'Normal', 'Sample means', 'The two essays'].forEach((h, i) => ok(heads[i].indexOf(h) === 0, 'heading ' + (i + 1) + ': ' + h));
   ['chance of A + chance of B − chance of both', '(1 − chance of A) × (1 − chance of B)', 'top and bottom each go down by 1', 'the given group', 'group share × group rate', '=COMBIN(total, chosen)', '=PERMUT(total, chosen)', 'a loss is a negative value',

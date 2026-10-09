@@ -323,3 +323,5 @@ details.work summary{font-size:12px}
 .fct .fck{white-space:normal;width:30%;letter-spacing:.06em;font-size:10.5px}
 .fct .fcv{overflow-wrap:anywhere}
 @media print{ body.printkit .fct .fch td{font-size:8px;padding:3px 4px} body.printkit .fct .fck{font-size:7.5px} }
+.fcwrap.fcone{grid-template-columns:1fr;max-width:760px}
+@media print{ body.printkit .fcwrap.fcone{grid-template-columns:1fr;max-width:none;margin-top:8px} body.printkit #kitCard .note-sec{display:none} }

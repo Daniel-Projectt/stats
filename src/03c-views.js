@@ -213,6 +213,8 @@ function renderKit(){
   $("#kitCard").innerHTML =
     '<div class="note-sec"><div class="point"><b>The point</b><p>You may bring <mark>one flashcard</mark>. First decide which kind of problem it is (the headings), then find the question, then copy the formula. Copy it by hand; writing it is half the studying.</p><p class="able"><b>Before the exam</b>cover it and see how much you can already write from memory. What you can, leave off and use the space for what you cannot.</p></div></div>'+
     '<div class="fcwrap">'+side("Front · probability, binomial, Poisson", KIT.card.front)+side("Back · normal, sample means, essays", KIT.card.back)+'</div>'+
+    '<div class="note-sec" style="margin-top:26px"><h3 class="sub">If you still have space</h3><p>Fill it in this order: the two essays (20 points), the word questions, then the two worked examples.</p></div>'+
+    '<div class="fcwrap fcone">'+side("Extra · essays, word questions, worked examples", KIT.card.extra)+'</div>'+
     '<div class="toolbar" style="justify-content:center;margin-top:18px"><button class="btn" type="button" id="kitPrint">Print this card</button></div>';
   $("#kitPrint").addEventListener("click", function(){ document.body.classList.add("printkit"); window.print(); setTimeout(function(){ document.body.classList.remove("printkit"); }, 800); });
   $("#kitTools").innerHTML = KIT.tools.map(function(t){
